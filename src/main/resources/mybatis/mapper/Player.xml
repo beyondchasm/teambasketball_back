@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="site.beyondchasm.teambasketball.player.mapper.PlayerMapper">
+
+
+	<resultMap id="playerResultMap"
+		type="site.beyondchasm.teambasketball.player.model.PlayerDto">
+		<id property="user_id" column="user_id" />
+		<result property="profile_image" column="profile_image" />
+		<result property="name" column="name" />
+		<result property="birthyear" column="birthyear" />
+		<result property="gender" column="gender" />
+		<result property="email" column="email" />
+		<result property="weight" column="weight" />
+		<result property="height" column="height" />
+	</resultMap>
+
+
+	<select id="getPlayerList" resultMap="playerResultMap"
+		parameterType="site.beyondchasm.teambasketball.player.command.PlayerFilterCommand">
+		SELECT
+		c.*
+		FROM tbl_user_bais c
+		<where>
+			<if
+				test="filter.search_player_type != null and !filter.search_player_type.isEmpty()">
+				AND c.player_type IN
+				<foreach item="type" collection="filter.search_player_type"
+					open="(" separator="," close=")">
+					#{type}
+				</foreach>
+			</if>
+			<if
+				test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
+				AND c.region_code = #{filter.search_region_code}
+			</if>
+			<if
+				test="filter.search_player_name != null and !filter.search_player_name.isEmpty()">
+				AND c.player_name LIKE CONCAT('%',
+				#{filter.search_player_name},
+				'%')
+			</if>
+			<!-- 추가 필터링 조건을 이곳에 삽입 -->
+		</where>
+	</select>
+
+	<select id="getPlayerDetail" parameterType="java.lang.Long"
+		resultMap="playerResultMap">
+		SELECT * FROM tbl_user_bais WHERE user_id = #{user_id}
+	</select>
+
+
+</mapper>

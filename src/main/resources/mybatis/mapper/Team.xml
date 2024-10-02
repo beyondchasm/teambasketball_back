@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="site.beyondchasm.teambasketball.team.mapper.TeamMapper">
+
+	<resultMap id="teamResultDto"
+		type="site.beyondchasm.teambasketball.team.model.TeamDto">
+		<id property="team_id" column="team_id" />
+		<result property="team_name" column="team_name" />
+		<result property="team_logo_image" column="team_logo_image" />
+		<result property="since_date" column="since_date" />
+		<result property="division_code" column="division_code" />
+		<result property="region_code" column="region_code" />
+		<result property="introduce" column="introduce" />
+		<result property="created_at" column="created_at" />
+		<result property="updated_at" column="updated_at" />
+	</resultMap>
+
+	<select id="getTeamListCount" resultType="long"
+		parameterType="site.beyondchasm.teambasketball.team.command.TeamFilterCommand">
+		SELECT COUNT(*) FROM tbl_team_bais a
+		<where>
+			<if
+				test="filter.search_division_code != null and !filter.search_division_code.isEmpty()">
+				AND a.division_code IN
+				<foreach item="item"
+					collection="filter.search_division_code" open="(" separator=","
+					close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if
+				test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
+				AND a.region_code = #{filter.search_region_code}
+			</if>
+			<if
+				test="filter.search_team_name != null and !filter.search_team_name.isEmpty()">
+				AND a.team_name LIKE CONCAT('%', #{filter.search_team_name}, '%')
+			</if>
+		</where>
+	</select>
+
+	<select id="getTeamList" resultMap="teamResultDto"
+		parameterType="site.beyondchasm.teambasketball.team.command.TeamFilterCommand">
+		SELECT
+		a.team_id,
+		a.team_name,
+		a.team_logo_image,
+		a.since_date,
+		a.division_code,
+		a.region_code,
+		a.introduce,
+		a.created_at,
+		a.updated_at
+		FROM
+		tbl_team_bais a
+		<where>
+			<if
+				test="filter.search_division_code != null and !filter.search_division_code.isEmpty()">
+				AND a.division_code IN
+				<foreach item="item"
+					collection="filter.search_division_code" open="(" separator=","
+					close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if
+				test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
+				AND a.region_code = #{filter.search_region_code}
+			</if>
+			<if
+				test="filter.search_team_name != null and !filter.search_team_name.isEmpty()">
+				AND a.team_name LIKE CONCAT('%', #{filter.search_team_name}, '%')
+			</if>
+		</where>
+		ORDER BY a.team_id ASC
+	</select>
+
+	<select id="getTeamDetail" parameterType="java.lang.Long"
+		resultType="site.beyondchasm.teambasketball.team.model.TeamDto">
+		SELECT
+		a.team_id, a.team_name, a.team_logo_image,
+		a.since_date, a.division_code, a.region_code,
+		a.introduce, a.created_at, a.updated_at
+		FROM
+		tbl_team_bais a
+		WHERE
+		team_id = #{team_id}
+	</select>
+
+	<insert id="createTeam"
+		parameterType="site.beyondchasm.teambasketball.team.command.TeamCommand"
+		useGeneratedKeys="true" keyProperty="team_id">
+		INSERT INTO tbl_team_bais
+		(team_name, team_logo_image, since_date, division_code, region_code, introduce,
+		created_at, updated_at)
+		VALUES (#{team_name}, #{team_logo_image}, #{since_date}, #{division_code},
+		#{region_code}, #{introduce}, NOW(), NOW())
+	</insert>
+
+	<update id="editTeam"
+		parameterType="site.beyondchasm.teambasketball.team.command.TeamCommand">
+		UPDATE tbl_team_bais
+		<set>
+			<if test="team_name != null"> team_name = #{team_name},</if>
+			<if test="team_logo_image != null"> team_logo_image = #{team_logo_image},</if>
+			<if test="since_date != null"> since_date = #{since_date},</if>
+			<if test="division_code != null"> division_code = #{division_code},</if>
+			<if test="region_code != null"> region_code = #{region_code},</if>
+			<if test="introduce != null"> introduce = #{introduce},</if>
+			updated_at = NOW()
+		</set>
+		WHERE team_id = #{team_id}
+	</update>
+
+	<insert id="addTeamMember"
+		parameterType="site.beyondchasm.teambasketball.team.command.TeamMemberCommand">
+		INSERT INTO tbl_team_member (team_id, user_id, player_number, role)
+		VALUES (#{team_id}, #{user_id}, #{player_number}, #{role})
+	</insert>
+
+</mapper>
