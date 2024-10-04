@@ -25,6 +25,10 @@
         <result property="created_at" column="created_at"/>
         <result property="updated_at" column="updated_at"/>
         <result property="view_cnt" column="view_cnt"/>
+        <result property="is_reaction" column="is_reaction"/>
+        <result property="like_cnt" column="like_cnt"/>
+        <result property="dislike_cnt" column="dislike_cnt"/>
+        <result property="comment_cnt" column="comment_cnt"/>
     </resultMap>
     <!-- 피드이미지 결과 매핑 -->
     <resultMap id="FeedImageResultMap"
@@ -65,11 +69,31 @@
     <select id="getFeedsByChannel"
             parameterType="site.beyondchasm.teambasketball.community.command.FeedFilterCommand"
             resultMap="FeedResultMap">
-        SELECT *
-        FROM tbl_feed_bais
-        WHERE channel_id =
-              #{filter.channel_id}
-        ORDER BY created_at DESC
+        SELECT a.feed_id,
+               a.channel_id,
+               a.title,
+               a.content_type,
+               a.content,
+               a.user_id,
+               a.created_at,
+               a.updated_at,
+               (SELECT count(*) FROM tbl_feed_view x WHERE x.feed_id = a.feed_id)    AS view_cnt,
+               (SELECT count(*) FROM tbl_comment_bais x WHERE x.feed_id = a.feed_id) AS comment_cnt,
+               (SELECT count(*)
+                FROM tbl_feed_reaction x
+                WHERE x.feed_id = a.feed_id
+                  and x.type = 'like')                                               AS like_cnt,
+               (SELECT count(*)
+                FROM tbl_feed_reaction x
+                WHERE x.feed_id = a.feed_id
+                  and x.type = 'dislike')                                            AS dislike_cnt,
+               (SELECT nullif(x.type, 'N')
+                FROM tbl_feed_reaction x
+                WHERE x.feed_id = a.feed_id
+                  AND user_id = #{filter.logined_user_id})                           AS is_reaction
+        FROM tbl_feed_bais a
+        WHERE a.channel_id = #{filter.channel_id}
+        ORDER BY a.created_at DESC
             LIMIT #{limit}
         OFFSET #{offset}
     </select>
@@ -77,9 +101,30 @@
     <!-- 피드 ID로 피드 조회 -->
     <select id="getFeedById" parameterType="long"
             resultMap="FeedResultMap">
-        SELECT *
-        FROM tbl_feed_bais
-        WHERE feed_id = #{feed_id}
+        SELECT a.feed_id,
+               a.channel_id,
+               a.title,
+               a.content_type,
+               a.content,
+               a.user_id,
+               a.created_at,
+               a.updated_at,
+               (SELECT count(*) FROM tbl_feed_view x WHERE x.feed_id = a.feed_id)    AS view_cnt,
+               (SELECT count(*) FROM tbl_comment_bais x WHERE x.feed_id = a.feed_id) AS comment_cnt,
+               (SELECT count(*)
+                FROM tbl_feed_reaction x
+                WHERE x.feed_id = a.feed_id
+                  and x.type = 'like')                                               AS like_cnt,
+               (SELECT count(*)
+                FROM tbl_feed_reaction x
+                WHERE x.feed_id = a.feed_id
+                  and x.type = 'dislike')                                            AS dislike_cnt,
+               (SELECT nullif(x.type, 'N')
+                FROM tbl_feed_reaction x
+                WHERE x.feed_id = a.feed_id
+                  AND user_id = #{logined_user_id})                                  AS is_reaction
+        FROM tbl_feed_bais a
+        WHERE a.feed_id = #{feed_id}
     </select>
 
     <!-- 피드 ID로 피드이미지 조회 -->
@@ -197,7 +242,7 @@
          created_at, updated_at)
         VALUES (#{feed_id},
                 #{content}, #{user_id}, #{created_at},
-                #{updated_at})
+                #{created_at})
     </insert>
 
     <!-- 댓글 업데이트 -->
@@ -244,19 +289,20 @@
     </select>
 
     <!-- 피드 좋아요 생성 -->
-    <insert id="likeFeed"
-            parameterType="site.beyondchasm.teambasketball.community.model.FeedLikeDto">
-        INSERT INTO tbl_feed_like (feed_id, user_id,
-                                   created_at)
-        VALUES (#{feed_id}, #{user_id},
+    <insert id="addOrUpdateReaction"
+            parameterType="site.beyondchasm.teambasketball.community.model.FeedReactionDto">
+        INSERT INTO tbl_feed_reaction (feed_id, user_id,
+                                       type,
+                                       created_at)
+        VALUES (#{feed_id}, #{user_id}, #{type},
                 #{created_at})
     </insert>
 
     <!-- 피드 좋아요 삭제 -->
-    <delete id="unlikeFeed"
-            parameterType="site.beyondchasm.teambasketball.community.model.FeedLikeDto">
+    <delete id="deleteFeedReaction"
+            parameterType="site.beyondchasm.teambasketball.community.model.FeedReactionDto">
         DELETE
-        FROM tbl_feed_like
+        FROM tbl_feed_reaction
         WHERE feed_id = #{feed_id}
           AND user_id = #{user_id}
     </delete>
@@ -265,7 +311,7 @@
     <select id="countFeedLikes" parameterType="long"
             resultType="int">
         SELECT COUNT(*)
-        FROM tbl_feed_like
+        FROM tbl_feed_reaction
         WHERE feed_id = #{feed_id}
     </select>
 

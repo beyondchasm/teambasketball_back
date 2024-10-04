@@ -9,17 +9,11 @@ import org.springframework.stereotype.Service;
 import site.beyondchasm.teambasketball.common.domain.PaginationResult;
 import site.beyondchasm.teambasketball.community.command.FeedFilterCommand;
 import site.beyondchasm.teambasketball.community.mapper.CommunityMapper;
-import site.beyondchasm.teambasketball.community.model.ChannelDto;
-import site.beyondchasm.teambasketball.community.model.CommentDto;
-import site.beyondchasm.teambasketball.community.model.CommentLikeDto;
-import site.beyondchasm.teambasketball.community.model.FeedDto;
-import site.beyondchasm.teambasketball.community.model.FeedImageDto;
-import site.beyondchasm.teambasketball.community.model.FeedLikeDto;
-import site.beyondchasm.teambasketball.community.model.FeedViewDto;
+import site.beyondchasm.teambasketball.community.model.*;
 
 @Service
 public class CommunityService {
-
+    @Autowired
     private CommunityMapper communityMapper;
 
     public List<ChannelDto> getChannels() {
@@ -41,15 +35,16 @@ public class CommunityService {
         return result;
     }
 
-    public FeedDto getFeedById(long feed_id) {
-        return communityMapper.getFeedById(feed_id);
+    public FeedDto getFeedById(long feed_id, long logined_user_id) {
+        addFeedView(feed_id, logined_user_id);
+        return communityMapper.getFeedById(feed_id, logined_user_id);
     }
 
-    public FeedDto createFeed(FeedDto feedDto) {
+    public FeedDto createFeed(FeedDto feedDto, long logined_user_id) {
         communityMapper.createFeed(feedDto);
         long generatedFeedId = feedDto.getFeed_id();
 
-        return getFeedById(generatedFeedId);
+        return getFeedById(generatedFeedId, logined_user_id);
     }
 
     public int updateFeed(FeedDto feedDto) {
@@ -103,32 +98,32 @@ public class CommunityService {
     }
 
     // 피드 좋아요 관련 메소드
-    public int likeFeed(FeedLikeDto feedLikeDto) {
-        return communityMapper.likeFeed(feedLikeDto);
+    public int addOrUpdateReaction(FeedReactionDto feedReactionDto) {
+        int result = communityMapper.deleteFeedReaction(feedReactionDto);
+        return communityMapper.addOrUpdateReaction(feedReactionDto);
     }
 
-    public int unlikeFeed(FeedLikeDto feedLikeDto) {
-        return communityMapper.unlikeFeed(feedLikeDto);
+    // 피드 좋아요 관련 메소드
+    public int deleteFeedReaction(FeedReactionDto feedReactionDto) {
+
+        return communityMapper.deleteFeedReaction(feedReactionDto);
     }
 
-    public int countFeedLikes(long feed_id) {
-        return communityMapper.countFeedLikes(feed_id);
-    }
 
     // 피드 조회 관련 메소드
-    public void addFeedView(long feed_id, long user_id) {
+    public void addFeedView(long feed_id, long logined_user_id) {
         // 사용자가 이미 조회했는지 확인
-        int count = communityMapper.hasUserViewedFeed(feed_id, user_id);
-        if (count == 0) {
-            // 조회 기록 추가
-            FeedViewDto feedViewDto = new FeedViewDto();
-            feedViewDto.setFeed_id(feed_id);
-            feedViewDto.setUser_id(user_id);
-            feedViewDto.setCreated_at(new Date());
+//        int count = communityMapper.hasUserViewedFeed(feed_id, logined_user_id);
+//        if (count == 0) {
+        // 조회 기록 추가
+        FeedViewDto feedViewDto = new FeedViewDto();
+        feedViewDto.setFeed_id(feed_id);
+        feedViewDto.setUser_id(logined_user_id);
+        feedViewDto.setCreated_at(new Date());
 
-            communityMapper.addFeedView(feedViewDto);
-            communityMapper.incrementViewCount(feed_id);
-        }
+        communityMapper.addFeedView(feedViewDto);
+        communityMapper.incrementViewCount(feed_id);
+//        }
     }
 
 }
