@@ -15,35 +15,39 @@ import site.beyondchasm.teambasketball.user.service.UserService;
 @RequiredArgsConstructor
 @Service
 public class KakaoOauthService {
-	private final UserService userService;
+    private final UserService userService;
 
-	// 카카오Api 호출해서 AccessToken으로 유저정보 가져오기
-	public Map<String, Object> getUserAttributesByToken(String accessToken) {
-		return WebClient.create().get().uri("https://kapi.kakao.com/v2/user/me")
-				.headers(httpHeaders -> httpHeaders.setBearerAuth(accessToken)).retrieve()
-				.bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
-				}).block();
-	}
+    // 카카오Api 호출해서 AccessToken으로 유저정보 가져오기
+    public Map<String, Object> getUserAttributesByToken(String accessToken) {
+        return WebClient.create().get().uri("https://kapi.kakao.com/v2/user/me")
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(accessToken)).retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                }).block();
+    }
 
-	// 카카오API에서 가져온 유저정보를 DB에 저장
-	public UserDto getUserProfileByToken(String accessToken) {
-		Map<String, Object> userAttributesByToken = getUserAttributesByToken(accessToken);
-		KakaoInfoDto kakaoInfoDto = new KakaoInfoDto(userAttributesByToken);
+    // 카카오API에서 가져온 유저정보를 DB에 저장
+    public UserDto getUserProfileByToken(String accessToken) {
+        Map<String, Object> userAttributesByToken = getUserAttributesByToken(accessToken);
+        KakaoInfoDto kakaoInfoDto = new KakaoInfoDto(userAttributesByToken);
 
-		UserDto userDto = userService.findByProviderId(Provider.KAKAO.getProvider(), kakaoInfoDto.getId().toString());
+        UserDto userDto = userService.findByProviderId(Provider.KAKAO.getProvider(), kakaoInfoDto.getId().toString());
 
-		UserDto newUserDto = UserDto.builder().provider_id(kakaoInfoDto.getId().toString())
-				.email(kakaoInfoDto.getEmail()).provider(Provider.KAKAO.getProvider()).name(kakaoInfoDto.getName())
-				.profile_image(kakaoInfoDto.getProfileImageUrl()).birthyear(kakaoInfoDto.getBirthyear())
-				.gender(kakaoInfoDto.getGender()).build();
+        UserDto newUserDto = new UserDto();
+        newUserDto.setProvider_id(kakaoInfoDto.getId().toString());
+        newUserDto.setEmail(kakaoInfoDto.getEmail());
+        newUserDto.setProvider(Provider.KAKAO.getProvider());
+        newUserDto.setName(kakaoInfoDto.getName());
+        newUserDto.setProfile_image(kakaoInfoDto.getProfileImageUrl());
+        newUserDto.setBirthyear(kakaoInfoDto.getBirthyear());
+        newUserDto.setGender(kakaoInfoDto.getGender());
 
-		if (userDto != null) {
+        if (userDto != null) {
 //			userService.update(userDto);
-		} else {
-			userService.save(newUserDto);
-		}
+        } else {
+            userService.save(newUserDto);
+        }
 
-		userDto = userService.findByProviderId(Provider.KAKAO.getProvider(), kakaoInfoDto.getId().toString());
-		return userDto;
-	}
+        userDto = userService.findByProviderId(Provider.KAKAO.getProvider(), kakaoInfoDto.getId().toString());
+        return userDto;
+    }
 }

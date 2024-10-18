@@ -16,6 +16,10 @@ public interface CommunityMapper {
 
     List<FeedDto> getFeedsByChannel(@Param("filter") FeedFilterCommand filter, @Param("offset") int offset,
                                     @Param("limit") int limit);
+    long getFeedByTeamListCount(@Param("filter") FeedFilterCommand filter);
+
+    List<FeedDto> getFeedsByTeam(@Param("filter") FeedFilterCommand filter, @Param("offset") int offset,
+                                    @Param("limit") int limit);
 
     List<ChannelDto> getChannels();
 
@@ -63,4 +67,12 @@ public interface CommunityMapper {
     List<FeedImageDto> getFeedImages(long feed_id);
 
     int deleteFeedReaction(FeedReactionDto feedReactionDto);
+
+    void deleteFeedAllReaction(long feed_id);
+
+    void deleteFeedAllView(long feed_id);
+
+    int deleteFeedAllImages(long feed_id);
+
+    void deleteFeedAllComment(long feed_id);
 }

@@ -2,11 +2,7 @@ package site.beyondchasm.teambasketball.player.model;
 
 import lombok.*;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
+@Data
 public class PlayerDto {
     private Long user_id; // 유저 ID
     private String profile_image; // 프로필 이미지 URL
@@ -16,4 +12,6 @@ public class PlayerDto {
     private String email; // 이메일
     private Integer weight; // 체중 (kg)
     private Integer height; // 키 (cm)
+    private String position; //포지션코드
+    private String region_code; //활동지역
 }

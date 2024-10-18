@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.beyondchasm.teambasketball.exception.CustomException;
 import site.beyondchasm.teambasketball.exception.ErrorCode;
-import site.beyondchasm.teambasketball.team.command.TeamCommand;
-import site.beyondchasm.teambasketball.team.command.TeamFilterCommand;
-import site.beyondchasm.teambasketball.team.command.TeamPhotoCommand;
-import site.beyondchasm.teambasketball.team.command.TeamScheduleInfoCommand;
+import site.beyondchasm.teambasketball.team.command.*;
 import site.beyondchasm.teambasketball.team.model.TeamDto;
 import site.beyondchasm.teambasketball.team.model.TeamMemberDto;
 import site.beyondchasm.teambasketball.team.model.TeamPhotoDto;
@@ -25,15 +22,16 @@ public class TeamController {
 
     // 팀 신규등록 API
     @PostMapping("/createTeam")
-    public ResponseEntity<TeamDto> createTeam(@RequestBody TeamCommand teamCommand) {
-        TeamDto teamDto = teamService.createTeam(teamCommand);
+    public ResponseEntity<TeamDto> createTeam(@RequestBody TeamCreateCommand teamCreateCommand) {
+
+        TeamDto teamDto = teamService.createTeam(teamCreateCommand);
         return ResponseEntity.ok(teamDto);
     }
 
     // 팀 신규등록 API
     @PostMapping("/editTeam")
-    public ResponseEntity<TeamDto> editTeam(@RequestBody TeamCommand teamCommand) {
-        TeamDto teamDto = teamService.editTeam(teamCommand);
+    public ResponseEntity<TeamDto> editTeam(@RequestBody TeamUpdateCommand teamUpdateCommand) {
+        TeamDto teamDto = teamService.editTeam(teamUpdateCommand);
         return ResponseEntity.ok(teamDto);
     }
 
@@ -54,9 +52,9 @@ public class TeamController {
     }
 
     // 플레이어 상세 정보 조회 API
-    @GetMapping("/teamMemberList/{team_id}")
-    public ResponseEntity<List<TeamMemberDto>> getTeamMemberList(@PathVariable Long team_id) {
-        List<TeamMemberDto> teamMemberList = teamService.getTeamMemberList(team_id);
+    @GetMapping("/members/{team_id}")
+    public ResponseEntity<List<TeamMemberDto>> getTeamMembrs(@PathVariable Long team_id) {
+        List<TeamMemberDto> teamMemberList = teamService.getTeamMembrs(team_id);
         if (teamMemberList == null) {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
@@ -88,6 +86,12 @@ public class TeamController {
     public ResponseEntity<TeamPhotoDto> addTeamPhotos(@RequestBody TeamPhotoCommand command) {
         TeamPhotoDto teamPhotoDto = teamService.addTeamPhotos(command);
         return ResponseEntity.ok(teamPhotoDto);
+    }
+
+    @PostMapping("/applyTeam")
+    public ResponseEntity<Boolean> applyTeam(@RequestBody TeamApplyCommand command) {
+        Boolean rtnVal = teamService.applyTeam(command);
+        return ResponseEntity.ok(rtnVal);
     }
 
     @GetMapping("/teamPhotosList/{team_id}")

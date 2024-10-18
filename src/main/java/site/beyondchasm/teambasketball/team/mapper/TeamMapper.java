@@ -5,47 +5,53 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import site.beyondchasm.teambasketball.team.command.TeamCommand;
-import site.beyondchasm.teambasketball.team.command.TeamFilterCommand;
-import site.beyondchasm.teambasketball.team.command.TeamMemberCommand;
-import site.beyondchasm.teambasketball.team.command.TeamPhotoCommand;
-import site.beyondchasm.teambasketball.team.command.TeamScheduleInfoCommand;
-import site.beyondchasm.teambasketball.team.model.TeamDto;
-import site.beyondchasm.teambasketball.team.model.TeamMemberDto;
-import site.beyondchasm.teambasketball.team.model.TeamPhotoDto;
-import site.beyondchasm.teambasketball.team.model.TeamScheduleInfoDto;
+import site.beyondchasm.teambasketball.team.command.*;
+import site.beyondchasm.teambasketball.team.model.*;
 
 @Mapper
 public interface TeamMapper {
 
-	long getTeamListCount(@Param("filter") TeamFilterCommand filter);
+    long getTeamListCount(@Param("filter") TeamFilterCommand filter);
 
-	List<TeamDto> getTeamList(@Param("filter") TeamFilterCommand filter);
+    List<TeamDto> getTeamList(@Param("filter") TeamFilterCommand filter);
 
-	TeamDto getTeamDetail(Long team_id);
+    TeamDto getTeamDetail(Long team_id);
 
-	void createTeam(TeamCommand teamCommand);
+    void createTeam(TeamCreateCommand teamCreateCommand);
 
-	void addTeamMember(TeamMemberCommand teanMemberCommand);
+    void addTeamMember(TeamMemberCommand teanMemberCommand);
 
-	List<TeamDto> getMyTeamList(Long user_id);
+    MyTeamDto getMyTeamDetail(Long user_id);
 
-	List<TeamMemberDto> getTeamMemberList(Long team_id);
+    List<TeamMemberDto> getTeamMembrs(Long team_id);
 
-	void editTeam(TeamCommand teamCommand);
+    TeamMemberDto getMyMembrInfo(Long user_id);
 
-	void addTeamSchedule(TeamScheduleInfoCommand command);
+    void editTeam(TeamUpdateCommand teamUpdateCommand);
 
-	List<TeamScheduleInfoDto> getTeamScheduleList(Long team_id);
+    void addTeamSchedule(TeamScheduleInfoCommand command);
 
-	TeamScheduleInfoDto getTeamScheduleDetail(Long team_id, Long seq);
+    List<TeamScheduleInfoDto> getTeamScheduleList(Long team_id);
 
-	void addTeamPhotos(TeamPhotoCommand command);
+    TeamScheduleInfoDto getTeamScheduleDetail(Long team_id, Long seq);
 
-	TeamPhotoDto getTeamPhotoDetail(Long team_id, Long seq);
+    void addTeamPhotos(TeamPhotoCommand command);
 
-	List<TeamPhotoDto> getTeamPhotosList(Long team_id);
+    TeamPhotoDto getTeamPhotoDetail(Long team_id, Long seq);
 
-	void deleteTeamPhotos(Long team_id);
+    List<TeamPhotoDto> getTeamPhotosList(Long team_id);
 
+    void deleteTeamPhotos(Long team_id);
+
+    void addTeamAgeRange(TeamAgeRangeCommand teamAgeRangeCommand);
+
+    void addTeamActDay(TeamActDayCommand teamActDayCommand);
+
+    void addTeamActTime(TeamActTimeCommand teamActTimeCommand);
+
+    void deleteTeamAgeRange(Long team_id);
+
+    void deleteTeamActDay(Long team_id);
+
+    void deleteTeamActTime(Long team_id);
 }

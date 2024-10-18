@@ -35,6 +35,22 @@ public class CommunityService {
         return result;
     }
 
+    // 피드 관련 메소드
+    public PaginationResult<FeedDto> getFeedsByTeam(FeedFilterCommand filterCommand) {
+        int offset = filterCommand.getPage() * filterCommand.getSize();
+        List<FeedDto> feeds = communityMapper.getFeedsByTeam(filterCommand, offset, filterCommand.getSize());
+        long totalElements = communityMapper.getFeedByTeamListCount(filterCommand); // 전체 요소 개수 조회
+
+        PaginationResult<FeedDto> result = new PaginationResult<>();
+        result.setData(feeds);
+        result.setPage(filterCommand.getPage());
+        result.setPageSize(filterCommand.getSize());
+        result.setTotalElements(totalElements);
+
+        return result;
+    }
+
+
     public FeedDto getFeedById(long feed_id, long logined_user_id) {
         addFeedView(feed_id, logined_user_id);
         return communityMapper.getFeedById(feed_id, logined_user_id);
@@ -51,12 +67,29 @@ public class CommunityService {
         return communityMapper.updateFeed(feedDto);
     }
 
-    public int deleteFeed(long feed_id) {
-        return communityMapper.deleteFeed(feed_id);
+    public boolean deleteFeed(long feed_id) {
+        boolean rtnVal = true;
+
+        try {
+            communityMapper.deleteFeed(feed_id);
+            communityMapper.deleteFeedAllReaction(feed_id);
+            communityMapper.deleteFeedAllView(feed_id);
+            communityMapper.deleteFeedAllImages(feed_id);
+            communityMapper.deleteFeedAllComment(feed_id);
+        } catch (Exception e) {
+            rtnVal = false;
+        }
+
+
+        return rtnVal;
     }
 
     public int createFeedImage(FeedImageDto feedImageDto) {
         return communityMapper.createFeedImage(feedImageDto);
+    }
+
+    public int deleteFeedAllImages(long feed_id) {
+        return communityMapper.deleteFeedAllImages(feed_id);
     }
 
     public List<FeedImageDto> getFeedImages(long feed_id) {
@@ -125,5 +158,6 @@ public class CommunityService {
         communityMapper.incrementViewCount(feed_id);
 //        }
     }
+
 
 }

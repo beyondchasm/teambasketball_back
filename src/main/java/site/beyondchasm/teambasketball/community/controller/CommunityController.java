@@ -66,6 +66,17 @@ public class CommunityController {
     }
 
     /**
+     * 피드 목록 조회 GET /community/feeds
+     */
+    @GetMapping("/teamFeeds")
+    public PaginationResult<FeedDto> getTeamFeeds(FeedFilterCommand filterCommand) {
+        filterCommand.setLogined_user_id(getUserId());
+        // 필터 커맨드에 채널 ID 설정
+        PaginationResult<FeedDto> feeds = communityService.getFeedsByTeam(filterCommand);
+        return feeds;
+    }
+
+    /**
      * 특정 피드 조회 GET /community/feeds/{feed_id}
      */
     @GetMapping("/feeds/{feed_id}")
@@ -128,13 +139,31 @@ public class CommunityController {
     }
 
     /**
+     * 피드 이미지목록
+     */
+    @GetMapping("/feeds/{feed_id}/deleteFeedAllImages")
+    public ResponseEntity<Void> deleteFeedAllImages(@PathVariable("feed_id") Long feed_id) {
+
+
+        int result = communityService.deleteFeedAllImages(feed_id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * 피드 수정 PUT /community/feeds/{feed_id}
      */
     @PostMapping("/updateFeed")
     public ResponseEntity<String> updateFeed(@RequestBody FeedCommand feedCommand) {
         FeedDto feedDto = mapToDto(feedCommand);
-        feedDto.setChannel_id(feedCommand.getChannel_id());
+        feedDto.setFeed_id(feedCommand.getFeed_id());
+        feedDto.setIs_team(feedCommand.getIs_team());
+        if (feedCommand.getIs_team()) {
+            feedDto.setTeam_id(feedCommand.getTeam_id());
+        } else {
+            feedDto.setChannel_id(feedCommand.getChannel_id());
+        }
         feedDto.setTitle(feedCommand.getTitle());
+        feedDto.setContent_type(feedCommand.getContent_type());
         feedDto.setContent(feedCommand.getContent());
         feedDto.setUpdated_at(new Date());
 
@@ -154,8 +183,8 @@ public class CommunityController {
         // 피드가 해당 채널에 속하는지 확인
         FeedDto feed = communityService.getFeedById(feed_id, getUserId());
         if (feed != null) {
-            int result = communityService.deleteFeed(feed_id);
-            if (result > 0) {
+            boolean result = communityService.deleteFeed(feed_id);
+            if (result) {
                 return ResponseEntity.noContent().build();
             }
         }
@@ -197,6 +226,8 @@ public class CommunityController {
     public ResponseEntity<String> updateComment(@RequestBody CommentCommand commentCommand) {
         CommentDto commentDto = new CommentDto();
 
+
+        commentDto.setComment_id(commentCommand.getComment_id());
         commentDto.setContent(commentCommand.getContent());
         commentDto.setUpdated_at(new Date());
 
@@ -309,13 +340,16 @@ public class CommunityController {
     // Helper method to map FeedCommand to FeedDto
     private FeedDto mapToDto(FeedCommand command) {
         FeedDto dto = new FeedDto();
-        dto.setChannel_id(command.getChannel_id());
+        dto.setIs_team(command.getIs_team());
+        if (command.getIs_team()) {
+            dto.setTeam_id(command.getTeam_id());
+        } else {
+            dto.setChannel_id(command.getChannel_id());
+        }
         dto.setTitle(command.getTitle());
         dto.setContent_type(command.getContent_type());
         dto.setContent(command.getContent());
         dto.setUser_id(getUserId());
-        // dto.setChannel_id은 컨트롤러 메소드에서 설정
-        // dto.setCreated_at과 dto.setUpdated_at은 컨트롤러 메소드에서 설정
         return dto;
     }
 }

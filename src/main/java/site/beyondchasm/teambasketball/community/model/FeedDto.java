@@ -8,6 +8,8 @@ import lombok.Data;
 public class FeedDto {
     private long feed_id;
     private long channel_id;
+    private Boolean is_team;
+    private long team_id;
     private String title;
     private String content_type;
     private String content;

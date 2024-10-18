@@ -2,10 +2,11 @@ package site.beyondchasm.teambasketball.player.command;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class PlayerFilterCommand {
 
-    private String search_team_id;
-    private String search_region_code;
-    private String[] search_position;
+    private int search_team_id;
+    private List<String> search_position;
 }

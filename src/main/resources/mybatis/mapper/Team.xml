@@ -3,122 +3,312 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper
-	namespace="site.beyondchasm.teambasketball.team.mapper.TeamMapper">
+        namespace="site.beyondchasm.teambasketball.team.mapper.TeamMapper">
 
-	<resultMap id="teamResultDto"
-		type="site.beyondchasm.teambasketball.team.model.TeamDto">
-		<id property="team_id" column="team_id" />
-		<result property="team_name" column="team_name" />
-		<result property="team_logo_image" column="team_logo_image" />
-		<result property="since_date" column="since_date" />
-		<result property="division_code" column="division_code" />
-		<result property="region_code" column="region_code" />
-		<result property="introduce" column="introduce" />
-		<result property="created_at" column="created_at" />
-		<result property="updated_at" column="updated_at" />
-	</resultMap>
+    <resultMap id="teamResultDto"
+               type="site.beyondchasm.teambasketball.team.model.TeamDto">
+        <id property="team_id" column="team_id"/>
+        <result property="team_name" column="team_name"/>
+        <result property="team_logo_image" column="team_logo_image"/>
+        <result property="since_date" column="since_date"/>
+        <result property="region_code" column="region_code"/>
+        <result property="introduce" column="introduce"/>
+        <result property="recruitment" column="recruitment"/>
+        <result property="is_recruiting" column="is_recruiting"/>
+        <result property="sns_address" column="sns_address"/>
+        <result property="created_at" column="created_at"/>
+        <result property="updated_at" column="updated_at"/>
+        <collection property="home_court" ofType="site.beyondchasm.teambasketball.court.model.CourtDto"
+                    column="home_court_id"
+                    select="site.beyondchasm.teambasketball.court.mapper.CourtMapper.getCourtDetail"/>
+        <collection property="members" ofType="site.beyondchasm.teambasketball.team.model.TeamMemberDto"
+                    column="team_id"
+                    select="site.beyondchasm.teambasketball.team.mapper.TeamMapper.getTeamMembrs"/>
 
-	<select id="getTeamListCount" resultType="long"
-		parameterType="site.beyondchasm.teambasketball.team.command.TeamFilterCommand">
-		SELECT COUNT(*) FROM tbl_team_bais a
-		<where>
-			<if
-				test="filter.search_division_code != null and !filter.search_division_code.isEmpty()">
-				AND a.division_code IN
-				<foreach item="item"
-					collection="filter.search_division_code" open="(" separator=","
-					close=")">
-					#{item}
-				</foreach>
-			</if>
-			<if
-				test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
-				AND a.region_code = #{filter.search_region_code}
-			</if>
-			<if
-				test="filter.search_team_name != null and !filter.search_team_name.isEmpty()">
-				AND a.team_name LIKE CONCAT('%', #{filter.search_team_name}, '%')
-			</if>
-		</where>
-	</select>
+        <collection property="age_ranges" ofType="site.beyondchasm.teambasketball.common.domain.CodeDTO"
+                    column="team_id"
+                    select="site.beyondchasm.teambasketball.team.mapper.TeamMapper.getAgeRanges"/>
+        <collection property="act_days" ofType="site.beyondchasm.teambasketball.common.domain.CodeDTO"
+                    column="team_id"
+                    select="site.beyondchasm.teambasketball.team.mapper.TeamMapper.getActDays"/>
+        <collection property="act_times" ofType="site.beyondchasm.teambasketball.common.domain.CodeDTO"
+                    column="team_id"
+                    select="site.beyondchasm.teambasketball.team.mapper.TeamMapper.getActTimes"/>
+    </resultMap>
+    <resultMap id="myTeamResultDto"
+               type="site.beyondchasm.teambasketball.team.model.MyTeamDto">
+        <id property="team_id" column="team_id"/>
+        <result property="team_name" column="team_name"/>
+        <result property="team_logo_image" column="team_logo_image"/>
+    </resultMap>
+    <resultMap id="teamMemberResultDto"
+               type="site.beyondchasm.teambasketball.team.model.TeamMemberDto">
+        <id property="team_id" column="team_id"/>
+        <result property="role" column="role"/>
+        <result property="player_number" column="player_number"/>
+        <result property="joined_at" column="joined_at"/>
+        <result property="application_content" column="application_content"/>
+        <result property="applicated_at" column="applicated_at"/>
+        <collection property="player" ofType="site.beyondchasm.teambasketball.player.model.PlayerDto" column="user_id"
+                    select="site.beyondchasm.teambasketball.player.mapper.PlayerMapper.getPlayerDetail"/>
+    </resultMap>
 
-	<select id="getTeamList" resultMap="teamResultDto"
-		parameterType="site.beyondchasm.teambasketball.team.command.TeamFilterCommand">
-		SELECT
-		a.team_id,
-		a.team_name,
-		a.team_logo_image,
-		a.since_date,
-		a.division_code,
-		a.region_code,
-		a.introduce,
-		a.created_at,
-		a.updated_at
-		FROM
-		tbl_team_bais a
-		<where>
-			<if
-				test="filter.search_division_code != null and !filter.search_division_code.isEmpty()">
-				AND a.division_code IN
-				<foreach item="item"
-					collection="filter.search_division_code" open="(" separator=","
-					close=")">
-					#{item}
-				</foreach>
-			</if>
-			<if
-				test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
-				AND a.region_code = #{filter.search_region_code}
-			</if>
-			<if
-				test="filter.search_team_name != null and !filter.search_team_name.isEmpty()">
-				AND a.team_name LIKE CONCAT('%', #{filter.search_team_name}, '%')
-			</if>
-		</where>
-		ORDER BY a.team_id ASC
-	</select>
+    <select id="getTeamListCount" resultType="long"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamFilterCommand">
+        SELECT COUNT(*) FROM tbl_team_bais a
+        <where>
+            <if
+                    test="filter.search_age_range_code != null and !filter.search_age_range_code.isEmpty()">
+                AND a.team_id IN
+                ( SELECT b.team_id
+                FROM tbl_team_age_range b
+                WHERE b.code_id IN <foreach item="item"
+                                            collection="filter.search_age_range_code" open="(" separator=","
+                                            close=")">
+                #{item}
+            </foreach>)
+            </if>
+            <if
+                    test="filter.search_act_day_code != null and !filter.search_act_day_code.isEmpty()">
+                AND a.team_id IN
+                ( SELECT b.team_id
+                FROM tbl_team_act_day b
+                WHERE b.code_id IN <foreach item="item"
+                                            collection="filter.search_act_day_code" open="(" separator=","
+                                            close=")">
+                #{item}
+            </foreach>)
+            </if>
+            <if
+                    test="filter.search_act_time_code != null and !filter.search_act_time_code.isEmpty()">
+                AND a.team_id IN
+                ( SELECT b.team_id
+                FROM tbl_team_act_time b
+                WHERE b.code_id IN <foreach item="item"
+                                            collection="filter.search_act_time_code" open="(" separator=","
+                                            close=")">
+                #{item}
+            </foreach>)
+            </if>
+            <if
+                    test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
+                AND a.region_code = #{filter.search_region_code}
+            </if>
+            <if
+                    test="filter.search_team_name != null and !filter.search_team_name.isEmpty()">
+                AND a.team_name LIKE CONCAT('%', #{filter.search_team_name}, '%')
+            </if>
+        </where>
+    </select>
 
-	<select id="getTeamDetail" parameterType="java.lang.Long"
-		resultType="site.beyondchasm.teambasketball.team.model.TeamDto">
-		SELECT
-		a.team_id, a.team_name, a.team_logo_image,
-		a.since_date, a.division_code, a.region_code,
-		a.introduce, a.created_at, a.updated_at
-		FROM
-		tbl_team_bais a
-		WHERE
-		team_id = #{team_id}
-	</select>
+    <select id="getTeamList" resultMap="teamResultDto"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamFilterCommand">
+        SELECT
+        a.team_id,
+        a.team_name,
+        a.team_logo_image,
+        a.since_date,
+        a.home_court_id,
+        a.region_code,
+        a.introduce,
+        a.recruitment,
+        a.is_recruiting,
+        a.sns_address,
+        a.created_at,
+        a.updated_at
+        FROM
+        tbl_team_bais a
+        <where>
+            <if
+                    test="filter.search_age_range_code != null and !filter.search_age_range_code.isEmpty()">
+                AND a.team_id IN
+                ( SELECT b.team_id
+                FROM tbl_team_age_range b
+                WHERE b.code_id IN <foreach item="item"
+                                            collection="filter.search_age_range_code" open="(" separator=","
+                                            close=")">
+                #{item}
+            </foreach>)
+            </if>
+            <if
+                    test="filter.search_act_day_code != null and !filter.search_act_day_code.isEmpty()">
+                AND a.team_id IN
+                ( SELECT b.team_id
+                FROM tbl_team_act_day b
+                WHERE b.code_id IN <foreach item="item"
+                                            collection="filter.search_act_day_code" open="(" separator=","
+                                            close=")">
+                #{item}
+            </foreach>)
+            </if>
+            <if
+                    test="filter.search_act_time_code != null and !filter.search_act_time_code.isEmpty()">
+                AND a.team_id IN
+                ( SELECT b.team_id
+                FROM tbl_team_act_time b
+                WHERE b.code_id IN <foreach item="item"
+                                            collection="filter.search_act_time_code" open="(" separator=","
+                                            close=")">
+                #{item}
+            </foreach>)
+            </if>
+            <if
+                    test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
+                AND a.region_code = #{filter.search_region_code}
+            </if>
+            <if
+                    test="filter.search_team_name != null and !filter.search_team_name.isEmpty()">
+                AND a.team_name LIKE CONCAT('%', #{filter.search_team_name}, '%')
+            </if>
+        </where>
+        ORDER BY a.team_id ASC
+    </select>
 
-	<insert id="createTeam"
-		parameterType="site.beyondchasm.teambasketball.team.command.TeamCommand"
-		useGeneratedKeys="true" keyProperty="team_id">
-		INSERT INTO tbl_team_bais
-		(team_name, team_logo_image, since_date, division_code, region_code, introduce,
-		created_at, updated_at)
-		VALUES (#{team_name}, #{team_logo_image}, #{since_date}, #{division_code},
-		#{region_code}, #{introduce}, NOW(), NOW())
-	</insert>
+    <select id="getTeamDetail" parameterType="java.lang.Long"
+            resultMap="teamResultDto">
+        SELECT a.team_id,
+               a.team_name,
+               a.team_logo_image,
+               a.since_date,
+               a.home_court_id,
+               a.region_code,
+               a.introduce,
+               a.recruitment,
+               a.is_recruiting,
+               a.sns_address,
+               a.created_at,
+               a.updated_at
+        FROM tbl_team_bais a
+        WHERE team_id = #{team_id}
+    </select>
 
-	<update id="editTeam"
-		parameterType="site.beyondchasm.teambasketball.team.command.TeamCommand">
-		UPDATE tbl_team_bais
-		<set>
-			<if test="team_name != null"> team_name = #{team_name},</if>
-			<if test="team_logo_image != null"> team_logo_image = #{team_logo_image},</if>
-			<if test="since_date != null"> since_date = #{since_date},</if>
-			<if test="division_code != null"> division_code = #{division_code},</if>
-			<if test="region_code != null"> region_code = #{region_code},</if>
-			<if test="introduce != null"> introduce = #{introduce},</if>
-			updated_at = NOW()
-		</set>
-		WHERE team_id = #{team_id}
-	</update>
+    <select id="getMyTeamDetail" parameterType="java.lang.Long"
+            resultMap="myTeamResultDto">
+        SELECT a.team_id,
+               a.team_name,
+               a.team_logo_image
+        FROM tbl_team_bais a
+                 INNER JOIN tbl_team_member b
+                            ON a.team_id = b.team_id
+        WHERE b.user_id = #{user_id}
+    </select>
 
-	<insert id="addTeamMember"
-		parameterType="site.beyondchasm.teambasketball.team.command.TeamMemberCommand">
-		INSERT INTO tbl_team_member (team_id, user_id, player_number, role)
-		VALUES (#{team_id}, #{user_id}, #{player_number}, #{role})
-	</insert>
+    <select id="getTeamMembrs" resultMap="teamMemberResultDto">
+        SELECT a.team_id,
+               a.user_id,
+               a.player_number,
+               a.role,
+               a.joined_at
+        FROM tbl_team_member a
+        WHERE team_id = #{team_id}
+    </select>
+
+    <select id="getMyMembrInfo" resultMap="teamMemberResultDto">
+        SELECT a.team_id,
+               a.user_id,
+               a.player_number,
+               a.role,
+               a.joined_at
+        FROM tbl_team_member a
+        WHERE user_id = #{user_id}
+    </select>
+
+    <insert id="createTeam"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamCreateCommand"
+            useGeneratedKeys="true" keyProperty="team_id">
+        INSERT INTO tbl_team_bais
+        (team_name, team_logo_image, since_date, home_court_id, region_code, introduce, recruitment, is_recruiting,
+         sns_address,
+         created_at, updated_at)
+        VALUES (#{team_name}, #{team_logo_image}, #{since_date},
+                ${home_court_id}, #{region_code}, #{introduce}, #{recruitment}, #{is_recruiting}, #{sns_address}, NOW(),
+                NOW())
+    </insert>
+
+    <update id="editTeam"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamUpdateCommand">
+        UPDATE tbl_team_bais
+        <set>
+            <if test="team_name != null">team_name = #{team_name},</if>
+            <if test="team_logo_image != null">team_logo_image = #{team_logo_image},</if>
+            <if test="since_date != null">since_date = #{since_date},</if>
+            <if test="home_court_id != 0">home_court_id = #{home_court_id},</if>
+            <if test="region_code != null">region_code = #{region_code},</if>
+            <if test="introduce != null">introduce = #{introduce},</if>
+            <if test="recruitment != null">recruitment = #{recruitment},</if>
+            <if test="is_recruiting != null">is_recruiting = #{is_recruiting},</if>
+            <if test="sns_address != null">sns_address = #{sns_address},</if>
+            updated_at = NOW()
+        </set>
+        WHERE team_id = #{team_id}
+    </update>
+
+    <insert id="addTeamMember"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamMemberCommand">
+        INSERT INTO tbl_team_member (team_id, user_id, player_number, role, joined_at, introduction,
+                                     applicated_at)
+        VALUES (#{team_id}, #{user_id}, #{player_number}, #{role}, #{joined_at}, #{introduction},
+                #{applicated_at})
+    </insert>
+    <insert id="addTeamAgeRange"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamAgeRangeCommand">
+        INSERT INTO tbl_team_age_range (team_id, code_id)
+        VALUES (#{team_id}, #{code_id})
+    </insert>
+    <insert id="addTeamActTime"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamActTimeCommand">
+        INSERT INTO tbl_team_act_time (team_id, code_id)
+        VALUES (#{team_id}, #{code_id})
+    </insert>
+    <insert id="addTeamActDay"
+            parameterType="site.beyondchasm.teambasketball.team.command.TeamActDayCommand">
+        INSERT INTO tbl_team_act_day (team_id, code_id)
+        VALUES (#{team_id}, #{code_id})
+    </insert>
+    <delete id="deleteTeamAgeRange"
+            parameterType="java.lang.Long">
+        DELETE
+        FROM tbl_team_age_range
+        WHERE team_id = #{team_id}
+    </delete>
+    <delete id="deleteTeamActTime"
+            parameterType="java.lang.Long">
+        DELETE
+        FROM tbl_team_act_time
+        WHERE team_id = #{team_id}
+    </delete>
+    <delete id="deleteTeamActDay"
+            parameterType="java.lang.Long">
+        DELETE
+        FROM tbl_team_act_day
+        WHERE team_id = #{team_id}
+    </delete>
+
+    <select id="getAgeRanges" resultType="site.beyondchasm.teambasketball.common.domain.CodeDTO">
+        SELECT a.code_type,
+               a.code_id,
+               a.code_name
+        FROM tbl_code_bais a
+                 INNER JOIN tbl_team_age_range b ON a.code_type = 'AGE_RANGE' AND a.code_id = b.code_id
+        WHERE b.team_id = #{team_id}
+    </select>
+
+    <select id="getActDays" resultType="site.beyondchasm.teambasketball.common.domain.CodeDTO">
+        SELECT a.code_type,
+               a.code_id,
+               a.code_name
+        FROM tbl_code_bais a
+                 INNER JOIN tbl_team_act_day b ON a.code_type = 'ACT_DAY' AND a.code_id = b.code_id
+        WHERE b.team_id = #{team_id}
+    </select>
+
+    <select id="getActTimes" resultType="site.beyondchasm.teambasketball.common.domain.CodeDTO">
+        SELECT a.code_type,
+               a.code_id,
+               a.code_name
+        FROM tbl_code_bais a
+                 INNER JOIN tbl_team_act_time b ON a.code_type = 'ACT_TIME' AND a.code_id = b.code_id
+        WHERE b.team_id = #{team_id}
+    </select>
 
 </mapper>

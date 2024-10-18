@@ -1,22 +1,17 @@
 package site.beyondchasm.teambasketball.team.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import site.beyondchasm.teambasketball.user.model.UserDto;
+import lombok.*;
+import site.beyondchasm.teambasketball.player.model.PlayerDto;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
+import java.util.Date;
+
+@Data
 public class TeamMemberDto {
-	private long team_id;
-	private long user_id;
-	private int player_number;
-	private String role;
-	private UserDto player;
-
+    private long team_id;
+    private PlayerDto player;
+    private int player_number;
+    private String role;
+    private String application_content;
+    private Date joined_at;
+    private Date applicated_at;
 }

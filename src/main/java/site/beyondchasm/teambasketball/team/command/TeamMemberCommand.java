@@ -1,19 +1,19 @@
 package site.beyondchasm.teambasketball.team.command;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import site.beyondchasm.teambasketball.auth.enums.TeamMemberRole;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
+import java.time.LocalDate;
+import java.util.Date;
+
+@Data
 public class TeamMemberCommand {
-	private long team_id;
-	private long user_id;
-	private int player_number;
-	private String role;
+    private long team_id;
+    private long user_id;
+    private int player_number;
+    private String role;
+    private String introduction;
+    private Date applicated_at;
+    private Date joined_at;
+
 }

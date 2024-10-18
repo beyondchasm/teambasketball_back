@@ -23,7 +23,7 @@ public class KakaoInfoDto {
 		this.profileImageUrl = kakao_profile.get("profile_image_url") != null
 				? kakao_profile.get("profile_image_url").toString()
 				: "";
-		this.name = kakao_account.get("name") != null ? kakao_account.get("name").toString() : "";
+		this.name = kakao_profile.get("nickname") != null ? kakao_profile.get("nickname").toString() : "";
 		this.birthyear = kakao_account.get("birthyear") != null ? kakao_account.get("birthyear").toString() : "";
 		this.gender = kakao_account.get("gender") != null ? kakao_account.get("gender").toString() : "";
 	}

@@ -20,6 +20,8 @@
 		<result property="role" column="role" />
 		<result property="weight" column="weight" />
 		<result property="height" column="height" />
+		<result property="position" column="position" />
+		<result property="region_code" column="region_code" />
 		<result property="createdAt" column="created_at"
 			javaType="java.util.Date" />
 		<result property="updatedAt" column="updated_at"
@@ -29,19 +31,33 @@
 	<!-- provider와 provider_id를 이용한 검색 쿼리 -->
 	<select id="findByProviderId" resultMap="userResultDto"
 		parameterType="java.lang.String">
-		SELECT user_id, provider, provider_id, profile_image, name, refresh_token,
-		fcm_token, birthyear, gender, email, role, weight, height, created_at,
-		updated_at
-		FROM tbl_user_bais
-		WHERE provider = #{provider}
-		AND provider_id = #{provider_id}
-	</select>
+        SELECT user_id,
+               provider,
+               provider_id,
+               profile_image,
+               name,
+               refresh_token,
+               fcm_token,
+               birthyear,
+               gender,
+               email,
+               role,
+               weight,
+               height,
+               position,
+               region_code,
+               created_at,
+               updated_at
+        FROM tbl_user_bais
+        WHERE provider = #{provider}
+          AND provider_id = #{provider_id}
+    </select>
 
 	<!-- user_id를 이용한 검색 쿼리 -->
 	<select id="findByUserId" resultMap="userResultDto"
 		parameterType="java.lang.Long">
 		SELECT user_id, provider, provider_id, profile_image, name, refresh_token,
-		fcm_token, birthyear, gender, email, role, weight, height, created_at,
+		fcm_token, birthyear, gender, email, role, weight, height,position,region_code, created_at,
 		updated_at
 		FROM tbl_user_bais
 		WHERE user_id = #{user_id}
@@ -51,7 +67,7 @@
 	<select id="findByRefreshToken" resultMap="userResultDto"
 		parameterType="java.lang.String">
 		SELECT user_id, provider, provider_id, profile_image, name, refresh_token,
-		fcm_token, birthyear, gender, email, role, weight, height, created_at,
+		fcm_token, birthyear, gender, email, role, weight, height,position, region_code,created_at,
 		updated_at
 		FROM tbl_user_bais
 		WHERE refresh_token = #{refreshToken}
@@ -60,36 +76,36 @@
 	<!-- 새로운 사용자 추가 -->
 	<insert id="save"
 		parameterType="site.beyondchasm.teambasketball.user.model.UserDto">
-		INSERT INTO tbl_user_bais (
-		provider, provider_id, name, profile_image, email, birthyear, gender, role,
-		weight, height, refresh_token, fcm_token, created_at, updated_at
-		) VALUES (
-		#{provider}, #{provider_id}, #{name}, #{profile_image}, #{email}, NULL,
-		NULL, NULL, NULL, NULL, '', '', NOW(), NOW()
-		)
-	</insert>
+        INSERT INTO tbl_user_bais (provider, provider_id, name, profile_image, email, birthyear, gender, role,
+                                   weight, height, refresh_token, fcm_token, position, region_code, created_at,
+                                   updated_at)
+        VALUES (#{provider}, #{provider_id}, #{name}, #{profile_image}, #{email}, NULL,
+                NULL, "USER", NULL, NULL, '', '', NULL, NULL, NOW(), NOW())
+    </insert>
 
 	<!-- 사용자 정보 업데이트 -->
 	<update id="update"
 		parameterType="site.beyondchasm.teambasketball.user.model.UserDto">
-		UPDATE tbl_user_bais
-		<set>
-			<if test="provider != null"> provider = #{provider},</if>
-			<if test="provider_id != null"> provider_id = #{provider_id},</if>
-			<if test="profile_image != null"> profile_image = #{profile_image},</if>
-			<if test="name != null"> name = #{name},</if>
-			<if test="email != null"> email = #{email},</if>
-			<if test="birthyear != null"> birthyear = #{birthyear},</if>
-			<if test="gender != null"> gender = #{gender},</if>
-			<if test="role != null"> role = #{role},</if>
-			<if test="weight != null"> weight = #{weight},</if>
-			<if test="height != null"> height = #{height},</if>
-			<if test="refreshToken != null"> refresh_token = #{refreshToken},</if>
-			<if test="fcmToken != null"> fcm_token = #{fcmToken},</if>
-			updated_at = NOW()
-		</set>
-		WHERE user_id = #{user_id}
-	</update>
+        UPDATE tbl_user_bais
+        <set>
+            <if test="provider != null">provider = #{provider},</if>
+            <if test="provider_id != null">provider_id = #{provider_id},</if>
+            <if test="profile_image != null">profile_image = #{profile_image},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="birthyear != null">birthyear = #{birthyear},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="role != null">role = #{role},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="height != null">height = #{height},</if>
+            <if test="refreshToken != null">refresh_token = #{refreshToken},</if>
+            <if test="fcmToken != null">fcm_token = #{fcmToken},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="region_code != null">region_code = #{region_code},</if>
+            updated_at = NOW()
+        </set>
+        WHERE user_id = #{user_id}
+    </update>
 
 	<!-- refreshToken 업데이트 -->
 	<update id="updateRefreshToken"
