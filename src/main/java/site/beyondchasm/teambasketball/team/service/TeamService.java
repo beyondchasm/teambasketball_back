@@ -10,7 +10,6 @@ import site.beyondchasm.teambasketball.team.command.*;
 import site.beyondchasm.teambasketball.team.mapper.TeamMapper;
 import site.beyondchasm.teambasketball.team.model.TeamDto;
 import site.beyondchasm.teambasketball.team.model.TeamMemberDto;
-import site.beyondchasm.teambasketball.team.model.TeamPhotoDto;
 import site.beyondchasm.teambasketball.team.model.TeamScheduleInfoDto;
 
 import java.time.LocalTime;
@@ -136,44 +135,6 @@ public class TeamService {
         return teamMapper.getTeamMembrs(team_id);
     }
 
-    public TeamScheduleInfoDto addTeamSchedule(TeamScheduleInfoCommand command) {
-        teamMapper.addTeamSchedule(command); // TeamCommand를 이용해 팀 생성
-        TeamScheduleInfoDto teamScheduleInfoDto = new TeamScheduleInfoDto();
-        return teamScheduleInfoDto;
-    }
-
-    public List<TeamScheduleInfoDto> getTeamScheduleList(Long team_id) {
-        return teamMapper.getTeamScheduleList(team_id);
-    }
-
-    public TeamScheduleInfoDto getTeamScheduleDetail(Long team_id, Long seq) {
-        return teamMapper.getTeamScheduleDetail(team_id, seq);
-    }
-
-    public TeamPhotoDto addTeamPhotos(TeamPhotoCommand command) {
-        // 트랜잭션 시작
-        try {
-            // 기존 사진 삭제
-            teamMapper.deleteTeamPhotos(command.getTeam_id());
-
-            teamMapper.addTeamPhotos(command); // TeamCommand를 이용해 팀 생성
-
-            // 트랜잭션 커밋
-        } catch (Exception e) {
-            // 예외 발생 시 트랜잭션 롤백
-        }
-
-        TeamPhotoDto teamPhotoDto = new TeamPhotoDto();
-        return teamPhotoDto;
-    }
-
-    public TeamPhotoDto getTeamPhotoDetail(Long team_id, Long seq) {
-        return teamMapper.getTeamPhotoDetail(team_id, seq);
-    }
-
-    public List<TeamPhotoDto> getTeamPhotosList(Long team_id) {
-        return teamMapper.getTeamPhotosList(team_id);
-    }
 
     public Boolean applyTeam(TeamApplyCommand command) {
 

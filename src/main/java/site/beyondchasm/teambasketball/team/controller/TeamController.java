@@ -8,7 +8,6 @@ import site.beyondchasm.teambasketball.exception.ErrorCode;
 import site.beyondchasm.teambasketball.team.command.*;
 import site.beyondchasm.teambasketball.team.model.TeamDto;
 import site.beyondchasm.teambasketball.team.model.TeamMemberDto;
-import site.beyondchasm.teambasketball.team.model.TeamPhotoDto;
 import site.beyondchasm.teambasketball.team.model.TeamScheduleInfoDto;
 import site.beyondchasm.teambasketball.team.service.TeamService;
 
@@ -61,32 +60,6 @@ public class TeamController {
         return ResponseEntity.ok(teamMemberList);
     }
 
-    // 정기 훈련 일정 등록 API
-    @PostMapping("/addTeamSchedule")
-    public ResponseEntity<TeamScheduleInfoDto> addTeamSchedule(@RequestBody TeamScheduleInfoCommand command) {
-        TeamScheduleInfoDto scheduleInfo = teamService.addTeamSchedule(command);
-        return ResponseEntity.ok(scheduleInfo);
-    }
-
-    @GetMapping("/teamScheduleList/{team_id}")
-    public ResponseEntity<List<TeamScheduleInfoDto>> getTeamScheduleList(@PathVariable Long team_id) {
-        List<TeamScheduleInfoDto> scheduleList = teamService.getTeamScheduleList(team_id);
-        return ResponseEntity.ok(scheduleList);
-    }
-
-    @GetMapping("/teamScheduleDetail/{team_id}/{seq}")
-    public ResponseEntity<TeamScheduleInfoDto> getTeamScheduleDetail(@PathVariable Long team_id,
-                                                                     @PathVariable Long seq) {
-        TeamScheduleInfoDto scheduleDetail = teamService.getTeamScheduleDetail(team_id, seq);
-        return ResponseEntity.ok(scheduleDetail);
-    }
-
-    // 정기 훈련 일정 등록 API
-    @PostMapping("/addTeamPhotos")
-    public ResponseEntity<TeamPhotoDto> addTeamPhotos(@RequestBody TeamPhotoCommand command) {
-        TeamPhotoDto teamPhotoDto = teamService.addTeamPhotos(command);
-        return ResponseEntity.ok(teamPhotoDto);
-    }
 
     @PostMapping("/applyTeam")
     public ResponseEntity<Boolean> applyTeam(@RequestBody TeamApplyCommand command) {
@@ -94,16 +67,5 @@ public class TeamController {
         return ResponseEntity.ok(rtnVal);
     }
 
-    @GetMapping("/teamPhotosList/{team_id}")
-    public ResponseEntity<List<TeamPhotoDto>> teamPhotosList(@PathVariable Long team_id) {
-        List<TeamPhotoDto> photosList = teamService.getTeamPhotosList(team_id);
-        return ResponseEntity.ok(photosList);
-    }
-
-    @GetMapping("/teamPhotoDetail/{team_id}/{seq}")
-    public ResponseEntity<TeamPhotoDto> teamPhotoDetail(@PathVariable Long team_id, @PathVariable Long seq) {
-        TeamPhotoDto photoDetail = teamService.getTeamPhotoDetail(team_id, seq);
-        return ResponseEntity.ok(photoDetail);
-    }
 
 }

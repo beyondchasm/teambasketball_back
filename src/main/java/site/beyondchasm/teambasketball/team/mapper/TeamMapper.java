@@ -29,19 +29,6 @@ public interface TeamMapper {
 
     void editTeam(TeamUpdateCommand teamUpdateCommand);
 
-    void addTeamSchedule(TeamScheduleInfoCommand command);
-
-    List<TeamScheduleInfoDto> getTeamScheduleList(Long team_id);
-
-    TeamScheduleInfoDto getTeamScheduleDetail(Long team_id, Long seq);
-
-    void addTeamPhotos(TeamPhotoCommand command);
-
-    TeamPhotoDto getTeamPhotoDetail(Long team_id, Long seq);
-
-    List<TeamPhotoDto> getTeamPhotosList(Long team_id);
-
-    void deleteTeamPhotos(Long team_id);
 
     void addTeamAgeRange(TeamAgeRangeCommand teamAgeRangeCommand);
 
