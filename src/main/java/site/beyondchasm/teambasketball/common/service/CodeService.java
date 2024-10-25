@@ -1,21 +1,24 @@
 package site.beyondchasm.teambasketball.common.service;
 
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import jakarta.annotation.Resource;
 import site.beyondchasm.teambasketball.common.dao.CodeDao;
 import site.beyondchasm.teambasketball.common.domain.CodeDTO;
 
 @Service
+@RequiredArgsConstructor
 public class CodeService {
 
-	@Resource(name = "codeDao")
-	private CodeDao codeDao; 
+  private final CodeDao codeDao;
 
-	public List<CodeDTO> getCodeList() {
-		return codeDao.getCodeList();
-	}
+  /**
+   * 모든 코드 목록을 조회합니다.
+   *
+   * @return List<CodeDTO> 코드 목록
+   */
+  public List<CodeDTO> getCodeList() {
+    return codeDao.getCodeList();
+  }
 
 }

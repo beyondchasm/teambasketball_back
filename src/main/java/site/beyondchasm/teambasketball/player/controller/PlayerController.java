@@ -3,12 +3,7 @@ package site.beyondchasm.teambasketball.player.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import site.beyondchasm.teambasketball.exception.CustomException;
@@ -19,24 +14,29 @@ import site.beyondchasm.teambasketball.player.service.PlayerService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/player")
+@RequestMapping("/api/players")
 public class PlayerController {
-	private final PlayerService playerService;
 
-	// 유저정보 조회 API
-	@PostMapping("/list")
-	public List<PlayerDto> list(@RequestBody PlayerFilterCommand playerFilterCommand) {
-		return playerService.getPlayerList(playerFilterCommand);
-	}
+  private final PlayerService playerService;
 
-	// 플레이어 상세 정보 조회 API
-	@GetMapping("/detail/{id}")
-	public ResponseEntity<PlayerDto> getPlayerDetail(@PathVariable Long id) {
-		PlayerDto playerDetail = playerService.getPlayerDetail(id);
-		if (playerDetail == null) {
-			throw new CustomException(ErrorCode.NOT_EXIST_USER);
-		}
-		return ResponseEntity.ok(playerDetail);
-	}
+  /**
+   * 플레이어 목록 조회 API GET /api/players
+   */
+  @GetMapping
+  public ResponseEntity<List<PlayerDto>> list(PlayerFilterCommand playerFilterCommand) {
+    List<PlayerDto> playerList = playerService.getPlayerList(playerFilterCommand);
+    return ResponseEntity.ok(playerList);
+  }
 
+  /**
+   * 플레이어 상세 정보 조회 API GET /api/players/{id}
+   */
+  @GetMapping("/{id}")
+  public ResponseEntity<PlayerDto> getPlayerDetail(@PathVariable Long id) {
+    PlayerDto playerDetail = playerService.getPlayerDetail(id);
+    if (playerDetail == null) {
+      throw new CustomException(ErrorCode.NOT_EXIST_USER);
+    }
+    return ResponseEntity.ok(playerDetail);
+  }
 }

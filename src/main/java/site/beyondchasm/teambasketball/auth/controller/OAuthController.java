@@ -1,12 +1,12 @@
 package site.beyondchasm.teambasketball.auth.controller;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,39 +20,58 @@ import site.beyondchasm.teambasketball.exception.CustomException;
 import site.beyondchasm.teambasketball.exception.ErrorCode;
 
 @RestController
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class OAuthController {
-    private final OauthService oauthService;
 
-    @PostMapping("/login/oauth/{provider}")
-    public OauthResponseDto login(@PathVariable String provider, @RequestBody OauthRequestDto oauthRequestDto,
-                                  HttpServletResponse response, HttpServletRequest request) {
-        OauthResponseDto oauthResponseDto = switch (provider) {
-            case "kakao" -> oauthService.loginWithKakao(oauthRequestDto.getAccessToken(), response);
-            case "google" -> oauthService.loginWithGoogle(oauthRequestDto.getAccessToken(), response);
-            default -> throw new IllegalArgumentException("Invalid provider: " + provider);
-        };
+  private final OauthService oauthService;
 
-        return oauthResponseDto;
+  /**
+   * OAuth를 통한 로그인
+   *
+   * @param provider        OAuth 제공자 (예: kakao, google)
+   * @param oauthRequestDto OAuth 요청 데이터 (accessToken 등)
+   * @param response        HttpServletResponse 객체 (쿠키 설정 등)
+   * @return OauthResponseDto 로그인 결과 데이터
+   */
+  @PostMapping("/oauth/{provider}")
+  public ResponseEntity<OauthResponseDto> login(
+      @PathVariable String provider,
+      @RequestBody OauthRequestDto oauthRequestDto,
+      HttpServletResponse response) {
+
+    OauthResponseDto oauthResponseDto = switch (provider.toLowerCase()) {
+      case "kakao" -> oauthService.loginWithKakao(oauthRequestDto.getAccessToken(), response);
+      case "google" -> oauthService.loginWithGoogle(oauthRequestDto.getAccessToken(), response);
+      default -> throw new CustomException(ErrorCode.INVALID_OAUTH_PROVIDER);
+    };
+
+    return new ResponseEntity<>(oauthResponseDto, HttpStatus.OK);
+  }
+
+  /**
+   * 리프레시 토큰을 이용한 액세스 토큰 재발급
+   *
+   * @param request HttpServletRequest 객체 (쿠키 추출)
+   * @return RefreshTokenResponseDto 재발급된 액세스 토큰
+   */
+  @PostMapping("/tokens/refresh")
+  public ResponseEntity<RefreshTokenResponseDto> refreshToken(HttpServletRequest request) {
+    RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
+
+    Optional<Cookie> refreshTokenCookieOpt = Arrays.stream(
+            Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
+        .filter(cookie -> "refresh_token".equals(cookie.getName()))
+        .findFirst();
+
+    if (refreshTokenCookieOpt.isEmpty()) {
+      throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
     }
 
-    // 리프레시 토큰으로 액세스토큰 재발 ≤급 받는 로직
-    @PostMapping("/token/refresh")
-    public RefreshTokenResponseDto tokenRefresh(HttpServletRequest request) {
-        RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
-        Cookie[] list = request.getCookies();
-        if (list == null) {
-            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
+    String refreshToken = refreshTokenCookieOpt.get().getValue();
+    String accessToken = oauthService.refreshAccessToken(refreshToken);
 
-        Cookie refreshTokenCookie = Arrays.stream(list).filter(cookie -> cookie.getName().equals("refresh_token"))
-                .collect(Collectors.toList()).get(0);
-
-        if (refreshTokenCookie == null) {
-            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
-        String accessToken = oauthService.refreshAccessToken(refreshTokenCookie.getValue());
-        refreshTokenResponseDto.setAccessToken(accessToken);
-        return refreshTokenResponseDto;
-    }
+    refreshTokenResponseDto.setAccessToken(accessToken);
+    return new ResponseEntity<>(refreshTokenResponseDto, HttpStatus.OK);
+  }
 }
