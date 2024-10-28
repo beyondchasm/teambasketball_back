@@ -20,42 +20,42 @@ import site.beyondchasm.teambasketball.user.model.UserDto;
 // SecurityContext authentication에 저장될 유저정보
 public class UserPrincipal implements UserDetails {
 
-	private Long id;
-	private String email;
-	private String password;
-	private Collection<? extends GrantedAuthority> authorities;
-	@Setter
-	private Map<String, Object> attributes;
+  private Long id;
+  private String email;
+  private String password;
+  private Collection<? extends GrantedAuthority> authorities;
+  @Setter
+  private Map<String, Object> attributes;
 
-	public static UserPrincipal create(UserDto user) {
-		List<GrantedAuthority> authorities = Collections
-				.singletonList(new SimpleGrantedAuthority(UserRole.USER.getRole()));
-		return new UserPrincipal(user.getUser_id(), user.getEmail(), "", authorities, null);
-	}
+  public static UserPrincipal create(UserDto user) {
+    List<GrantedAuthority> authorities = Collections
+        .singletonList(new SimpleGrantedAuthority(UserRole.USER.getRole()));
+    return new UserPrincipal(user.getUserId(), user.getEmail(), "", authorities, null);
+  }
 
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
 
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
 
-	@Override
-	public String getUsername() {
-		return email;
-	}
+  @Override
+  public String getUsername() {
+    return email;
+  }
 
 }

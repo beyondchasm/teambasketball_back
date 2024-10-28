@@ -4,11 +4,12 @@ import lombok.Data;
 
 @Data
 public class FeedFilterCommand {
-    private long logined_user_id;
-    private String search_keyword;
-    private Long channel_id;
-    private Long team_id;
-    private String sort_by;
-    private Integer page;
-    private Integer size;
+
+  private long loginedUserId;
+  private String searchKeyword;
+  private Long channelId;
+  private Long teamId;
+  private String sort;
+  private Integer page;
+  private Integer size;
 }

@@ -12,21 +12,36 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CourtService {
-    private final CourtMapper courtMapper;
 
-    public List<CourtDto> getCourtList(CourtFilterCommand filterCommand) {
-        List<CourtDto> courts = courtMapper.getCourtList(filterCommand);
+  private final CourtMapper courtMapper;
 
+  /**
+   * 필터 조건에 맞는 코트 목록을 조회합니다.
+   *
+   * @param filterCommand 코트 필터 조건
+   * @return 조회된 코트 목록
+   */
+  public List<CourtDto> getCourtList(CourtFilterCommand filterCommand) {
+    return courtMapper.getCourtList(filterCommand);
+  }
 
-        return courts;
-    }
+  /**
+   * 특정 코트의 상세 정보를 조회합니다.
+   *
+   * @param id 코트 ID
+   * @return 조회된 코트 상세 정보
+   */
+  public CourtDto getCourtDetail(Long id) {
+    return courtMapper.getCourtDetail(id);
+  }
 
-    public CourtDto getCourtDetail(Long id) {
-        return courtMapper.getCourtDetail(id);
-    }
-
-    public List<CourtImageDto> getCourtImages(Long id) {
-        return courtMapper.getCourtImages(id);
-    }
-
+  /**
+   * 특정 코트의 이미지 목록을 조회합니다.
+   *
+   * @param id 코트 ID
+   * @return 조회된 코트 이미지 목록
+   */
+  public List<CourtImageDto> getCourtImages(Long id) {
+    return courtMapper.getCourtImages(id);
+  }
 }

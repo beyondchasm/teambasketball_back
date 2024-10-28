@@ -6,8 +6,9 @@ import lombok.Data;
 
 @Data
 public class CommentLikeDto {
-	private long comment_id;
-	private long user_id;
-	private Date created_at;
+
+  private long commentId;
+  private long userId;
+  private Date createdAt;
 
 }

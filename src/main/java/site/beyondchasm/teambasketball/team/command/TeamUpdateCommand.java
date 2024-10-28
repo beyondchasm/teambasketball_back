@@ -1,24 +1,23 @@
 package site.beyondchasm.teambasketball.team.command;
 
 import lombok.Data;
-
 import java.util.Date;
 import java.util.List;
 
 @Data
 public class TeamUpdateCommand {
-    private long team_id;
-    private String team_name;
-    private String team_logo_image;
-    private Date since_date;
-    private List<String> age_ranges;
-    private List<String> act_days;
-    private List<String> act_times;
-    private long home_court_id;
-    private String recruitment;
-    private Boolean is_recruiting;
-    private String region_code;
-    private String introduce;
-    private String sns_address;
 
+  private long teamId;
+  private String teamName;
+  private String teamLogoImage;
+  private Date sinceDate;
+  private List<String> ageRanges;
+  private List<String> actDays;
+  private List<String> actTimes;
+  private long homeCourtId;
+  private String recruitment;
+  private Boolean isRecruiting;
+  private String regionCode;
+  private String introduce;
+  private String snsAddress;
 }

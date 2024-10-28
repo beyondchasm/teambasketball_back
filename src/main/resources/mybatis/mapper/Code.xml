@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper
-	namespace="site.beyondchasm.teambasketball.common.dao.CodeDao">
+<mapper namespace="site.beyondchasm.teambasketball.common.dao.CodeDao">
 
+  <resultMap id="codeResultMap" type="site.beyondchasm.teambasketball.common.domain.CodeDTO">
+    <result property="codeType" column="code_type"/>
+    <result property="codeId" column="code_id"/>
+    <result property="codeName" column="code_name"/>
+  </resultMap>
 
-	<select id="getCodeList"
-		resultType="site.beyondchasm.teambasketball.common.domain.CodeDTO">
-		SELECT
-		code_type,
-		code_id,
-		code_name
-		FROM
-		tbl_code_bais
-		WHERE
-		use_yn = 'Y'
-	</select>
+  <select id="getCodeList" resultMap="codeResultMap">
+    SELECT code_type,
+           code_id,
+           code_name
+    FROM
+      tbl_code_bais
+    WHERE use_yn = 'Y'
+  </select>
 
 </mapper>

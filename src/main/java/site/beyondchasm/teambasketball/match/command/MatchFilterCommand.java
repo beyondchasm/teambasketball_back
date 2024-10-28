@@ -9,8 +9,8 @@ import java.util.List;
 @Data
 public class MatchFilterCommand {
 
-  final List<String> match_type;
-  final LocalDate select_date;
-  final String region_code;
+  final List<String> matchType;
+  final LocalDate selectDate;
+  final String regionCode;
   final String order;
 }

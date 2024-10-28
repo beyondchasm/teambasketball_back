@@ -8,12 +8,12 @@ import java.util.Date;
 
 @Data
 public class TeamMemberCommand {
-    private long team_id;
-    private long user_id;
-    private int player_number;
-    private String role;
-    private String introduction;
-    private Date applicated_at;
-    private Date joined_at;
 
+  private long teamId;
+  private long userId;
+  private int playerNumber;
+  private String role;
+  private String introduction;
+  private Date applicatedAt;
+  private Date joinedAt;
 }

@@ -1,10 +1,8 @@
 package site.beyondchasm.teambasketball.player.controller;
 
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import lombok.RequiredArgsConstructor;
 import site.beyondchasm.teambasketball.exception.CustomException;
 import site.beyondchasm.teambasketball.exception.ErrorCode;
@@ -20,7 +18,10 @@ public class PlayerController {
   private final PlayerService playerService;
 
   /**
-   * 플레이어 목록 조회 API GET /api/players
+   * 플레이어 목록 조회
+   *
+   * @param playerFilterCommand 플레이어 필터 조건
+   * @return 필터링된 플레이어 목록
    */
   @GetMapping
   public ResponseEntity<List<PlayerDto>> list(PlayerFilterCommand playerFilterCommand) {
@@ -29,7 +30,10 @@ public class PlayerController {
   }
 
   /**
-   * 플레이어 상세 정보 조회 API GET /api/players/{id}
+   * 특정 플레이어의 상세 정보 조회
+   *
+   * @param id 조회할 플레이어 ID
+   * @return 조회된 플레이어의 상세 정보
    */
   @GetMapping("/{id}")
   public ResponseEntity<PlayerDto> getPlayerDetail(@PathVariable Long id) {

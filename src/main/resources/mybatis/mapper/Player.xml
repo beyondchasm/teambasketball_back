@@ -1,53 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper
-        namespace="site.beyondchasm.teambasketball.player.mapper.PlayerMapper">
+  namespace="site.beyondchasm.teambasketball.player.mapper.PlayerMapper">
 
+  <resultMap id="playerResultMap" type="site.beyondchasm.teambasketball.player.model.PlayerDto">
+    <id property="userId" column="user_id"/>
+    <result property="profileImage" column="profile_image"/>
+    <result property="name" column="name"/>
+    <result property="birthYear" column="birthyear"/>
+    <result property="gender" column="gender"/>
+    <result property="email" column="email"/>
+    <result property="weight" column="weight"/>
+    <result property="height" column="height"/>
+    <result property="position" column="position"/>
+    <result property="regionCode" column="region_code"/>
+  </resultMap>
 
-    <resultMap id="playerResultMap"
-               type="site.beyondchasm.teambasketball.player.model.PlayerDto">
-        <id property="user_id" column="user_id"/>
-        <result property="profile_image" column="profile_image"/>
-        <result property="name" column="name"/>
-        <result property="birthyear" column="birthyear"/>
-        <result property="gender" column="gender"/>
-        <result property="email" column="email"/>
-        <result property="weight" column="weight"/>
-        <result property="height" column="height"/>
-        <result property="position" column="position"/>
-        <result property="region_code" column="region_code"/>
-    </resultMap>
+  <select id="getPlayerList" resultMap="playerResultMap"
+    parameterType="site.beyondchasm.teambasketball.player.command.PlayerFilterCommand">
+    SELECT
+    a.*
+    FROM tbl_user_bais a
+    <where>
+      <if test="filter.searchPosition != null and !filter.searchPosition.isEmpty()">
+        AND a.position IN
+        <foreach item="position" collection="filter.searchPosition" open="(" separator=","
+          close=")">
+          #{position}
+        </foreach>
+      </if>
+      <if test="filter.searchTeamId != 0">
+        AND a.team_id = #{filter.searchTeamId}
+      </if>
+    </where>
+  </select>
 
-
-    <select id="getPlayerList" resultMap="playerResultMap"
-            parameterType="site.beyondchasm.teambasketball.player.command.PlayerFilterCommand">
-        SELECT
-        a.*
-        FROM tbl_user_bais a
-        <where>
-            <if
-                    test="filter.search_position != null and !filter.search_position.isEmpty()">
-                AND a.position IN
-                <foreach item="position" collection="filter.search_position"
-                         open="(" separator="," close=")">
-                    #{position}
-                </foreach>
-            </if>
-            <if
-                    test="filter.search_team_id != 0">
-                AND a.team_id = #{filter.search_team_id}
-            </if>
-        </where>
-    </select>
-
-    <select id="getPlayerDetail" parameterType="java.lang.Long"
-            resultMap="playerResultMap">
-        SELECT *
-        FROM tbl_user_bais
-        WHERE user_id = #{user_id}
-    </select>
-
+  <select id="getPlayerDetail" parameterType="java.lang.Long"
+    resultMap="playerResultMap">
+    SELECT *
+    FROM
+      tbl_user_bais
+    WHERE user_id = #{userId}
+  </select>
 
 </mapper>

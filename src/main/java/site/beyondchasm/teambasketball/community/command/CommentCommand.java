@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class CommentCommand {
-    private Long feed_id;
-    private Long comment_id;
-    private String content;
+
+  private Long feedId;
+  private Long commentId;
+  private String content;
 }

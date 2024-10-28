@@ -3,7 +3,6 @@ package site.beyondchasm.teambasketball.team.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import site.beyondchasm.teambasketball.exception.CustomException;
 import site.beyondchasm.teambasketball.exception.ErrorCode;
 import site.beyondchasm.teambasketball.team.command.*;
@@ -21,7 +20,10 @@ public class TeamController {
   private final TeamService teamService;
 
   /**
-   * 팀 생성 API POST /api/teams
+   * 새로운 팀을 생성합니다.
+   *
+   * @param teamCreateCommand 생성할 팀 정보
+   * @return 생성된 팀 정보
    */
   @PostMapping
   public ResponseEntity<TeamDto> createTeam(@RequestBody TeamCreateCommand teamCreateCommand) {
@@ -30,18 +32,25 @@ public class TeamController {
   }
 
   /**
-   * 팀 수정 API PUT /api/teams/{team_id}
+   * 팀 정보를 수정합니다.
+   *
+   * @param teamId            수정할 팀의 ID
+   * @param teamUpdateCommand 수정할 팀 정보
+   * @return 수정된 팀 정보
    */
   @PutMapping("/{team_id}")
-  public ResponseEntity<TeamDto> editTeam(@PathVariable Long team_id,
+  public ResponseEntity<TeamDto> editTeam(@PathVariable Long teamId,
       @RequestBody TeamUpdateCommand teamUpdateCommand) {
-    teamUpdateCommand.setTeam_id(team_id); // Command 객체에 ID 설정
+    teamUpdateCommand.setTeamId(teamId); // Command 객체에 ID 설정
     TeamDto teamDto = teamService.editTeam(teamUpdateCommand);
     return ResponseEntity.ok(teamDto);
   }
 
   /**
-   * 팀 목록 조회 API GET /api/teams
+   * 팀 목록을 조회합니다.
+   *
+   * @param teamFilterCommand 팀 목록 필터 조건
+   * @return 필터링된 팀 목록
    */
   @GetMapping
   public ResponseEntity<List<TeamDto>> list(TeamFilterCommand teamFilterCommand) {
@@ -50,11 +59,14 @@ public class TeamController {
   }
 
   /**
-   * 팀 상세 정보 조회 API GET /api/teams/{team_id}
+   * 특정 팀의 상세 정보를 조회합니다.
+   *
+   * @param teamId 조회할 팀의 ID
+   * @return 조회된 팀의 상세 정보
    */
   @GetMapping("/{team_id}")
-  public ResponseEntity<TeamDto> getTeamDetail(@PathVariable Long team_id) {
-    TeamDto teamDetail = teamService.getTeamDetail(team_id);
+  public ResponseEntity<TeamDto> getTeamDetail(@PathVariable Long teamId) {
+    TeamDto teamDetail = teamService.getTeamDetail(teamId);
     if (teamDetail == null) {
       throw new CustomException(ErrorCode.NOT_EXIST_USER);
     }
@@ -62,11 +74,14 @@ public class TeamController {
   }
 
   /**
-   * 팀 멤버 목록 조회 API GET /api/teams/{team_id}/members
+   * 특정 팀의 멤버 목록을 조회합니다.
+   *
+   * @param teamId 조회할 팀의 ID
+   * @return 팀 멤버 목록
    */
   @GetMapping("/{team_id}/members")
-  public ResponseEntity<List<TeamMemberDto>> getTeamMembers(@PathVariable Long team_id) {
-    List<TeamMemberDto> teamMemberList = teamService.getTeamMembrs(team_id);
+  public ResponseEntity<List<TeamMemberDto>> getTeamMembers(@PathVariable Long teamId) {
+    List<TeamMemberDto> teamMemberList = teamService.getTeamMembers(teamId);
     if (teamMemberList == null) {
       throw new CustomException(ErrorCode.NOT_EXIST_USER);
     }
@@ -74,12 +89,16 @@ public class TeamController {
   }
 
   /**
-   * 팀 가입 신청 API POST /api/teams/{team_id}/apply
+   * 팀 가입 신청을 수행합니다.
+   *
+   * @param teamId  신청할 팀의 ID
+   * @param command 팀 가입 신청 정보
+   * @return 가입 신청 성공 여부
    */
   @PostMapping("/{team_id}/apply")
-  public ResponseEntity<Boolean> applyTeam(@PathVariable Long team_id,
+  public ResponseEntity<Boolean> applyTeam(@PathVariable Long teamId,
       @RequestBody TeamApplyCommand command) {
-    command.setTeam_id(team_id); // Command 객체에 team_id 설정
+    command.setTeamId(teamId); // Command 객체에 teamId 설정
     Boolean rtnVal = teamService.applyTeam(command);
     return ResponseEntity.ok(rtnVal);
   }

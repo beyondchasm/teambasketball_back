@@ -8,9 +8,10 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 public class CourtImageDto {
-    private long court_id;
-    private long seq;
-    private String image_path;
-    private String is_main;
+
+  private long courtId;
+  private long seq;
+  private String imagePath;
+  private String isMain;
 
 }

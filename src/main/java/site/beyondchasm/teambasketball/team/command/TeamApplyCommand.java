@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TeamApplyCommand {
-    private long team_id;
-    private String introduction;
+
+  private long teamId;
+  private String introduction;
 }

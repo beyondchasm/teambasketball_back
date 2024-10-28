@@ -6,19 +6,20 @@ import lombok.Data;
 
 @Data
 public class FeedDto {
-    private long feed_id;
-    private long channel_id;
-    private Boolean is_team;
-    private long team_id;
-    private String title;
-    private String content_type;
-    private String content;
-    private long user_id;
-    private Date created_at;
-    private Date updated_at;
-    private int view_cnt;
-    private String is_reaction;
-    private int like_cnt;
-    private int dislike_cnt;
-    private int comment_cnt;
+
+  private long feedId;
+  private long channelId;
+  private Boolean isTeam;
+  private long teamId;
+  private String title;
+  private String contentType;
+  private String content;
+  private long userId;
+  private Date createdAt;
+  private Date updatedAt;
+  private int viewCnt;
+  private String isReaction;
+  private int likeCnt;
+  private int dislikeCnt;
+  private int commentCnt;
 }

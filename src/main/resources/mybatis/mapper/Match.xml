@@ -8,20 +8,20 @@
   <!-- 매치 정보를 가져오는 resultMap -->
   <resultMap id="matchResultDto"
     type="site.beyondchasm.teambasketball.match.model.MatchDto">
-    <id property="match_id" column="match_id"/>
-    <result property="match_type" column="match_type"/>
-    <result property="match_detail_type" column="match_detail_type"/>
-    <result property="region_code" column="region_code"/>
-    <result property="match_date" column="match_date"/>
-    <result property="start_time" column="start_time"/>
-    <result property="end_time" column="end_time"/>
-    <result property="join_fee" column="join_fee"/>
+    <id property="matchId" column="match_id"/>
+    <result property="matchType" column="match_type"/>
+    <result property="matchDetailType" column="match_detail_type"/>
+    <result property="regionCode" column="region_code"/>
+    <result property="matchDate" column="match_date"/>
+    <result property="startTime" column="start_time"/>
+    <result property="endTime" column="end_time"/>
+    <result property="joinFee" column="join_fee"/>
     <result property="description" column="description"/>
     <result property="status" column="status"/>
-    <result property="max_member_count" column="max_member_count"/>
-    <result property="host_user_id" column="host_user_id"/>
-    <result property="created_at" column="created_at"/>
-    <result property="updated_at" column="updated_at"/>
+    <result property="maxMemberCount" column="max_member_count"/>
+    <result property="hostUserId" column="host_user_id"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
     <!-- 코트 정보 참조 -->
     <collection property="court" javaType="site.beyondchasm.teambasketball.court.model.CourtDto"
       column="court_id"
@@ -36,9 +36,9 @@
   <!-- 매치 멤버 정보를 가져오는 resultMap -->
   <resultMap id="matchMemberResultDto"
     type="site.beyondchasm.teambasketball.match.model.MatchMemberDto">
-    <id property="match_id" column="match_id"/>
+    <id property="matchId" column="match_id"/>
     <result property="status" column="status"/>
-    <result property="joined_at" column="joined_at"/>
+    <result property="joinedAt" column="joined_at"/>
     <!-- 플레이어 정보 참조 -->
     <collection property="player" javaType="site.beyondchasm.teambasketball.player.model.PlayerDto"
       column="user_id"
@@ -50,16 +50,16 @@
     parameterType="site.beyondchasm.teambasketball.match.command.MatchFilterCommand">
     SELECT COUNT(*) FROM tbl_match_bais a
     <where>
-      <if test="filter.match_type != null and !filter.match_type.isEmpty()">
+      <if test="filter.matchType != null and !filter.matchType.isEmpty()">
         AND a.match_type IN
-        <foreach item="item" collection="filter.match_type" open="(" separator="," close=")">
+        <foreach item="item" collection="filter.matchType" open="(" separator="," close=")">
           #{item}
         </foreach>
       </if>
-      <if test="filter.region_code != null and !filter.region_code.isEmpty()">
-        AND a.region_code = #{filter.region_code}
+      <if test="filter.regionCode != null and !filter.regionCode.isEmpty()">
+        AND a.region_code = #{filter.regionCode}
       </if>
-      AND a.match_date = #{filter.select_date}
+      AND a.match_date = #{filter.selectDate}
     </where>
   </select>
 
@@ -83,16 +83,16 @@
     a.updated_at
     FROM tbl_match_bais a
     <where>
-      <if test="filter.match_type != null and !filter.match_type.isEmpty()">
+      <if test="filter.matchType != null and !filter.matchType.isEmpty()">
         AND a.match_type IN
-        <foreach item="item" collection="filter.match_type" open="(" separator="," close=")">
+        <foreach item="item" collection="filter.matchType" open="(" separator="," close=")">
           #{item}
         </foreach>
       </if>
-      <if test="filter.region_code != null and !filter.region_code.isEmpty()">
-        AND a.region_code = #{filter.region_code}
+      <if test="filter.regionCode != null and !filter.regionCode.isEmpty()">
+        AND a.region_code = #{filter.regionCode}
       </if>
-      AND a.match_date = #{filter.select_date}
+      AND a.match_date = #{filter.selectDate}
     </where>
     ORDER BY a.match_id ASC
   </select>
@@ -100,70 +100,63 @@
   <!-- 매치 상세 정보 가져오기 -->
   <select id="getMatchDetail" parameterType="java.lang.Long"
     resultMap="matchResultDto">
-    SELECT
-      a.match_id,
-      a.match_type,
-      a.match_detail_type,
-      a.court_id,
-      a.region_code,
-      a.match_date,
-      a.start_time,
-      a.end_time,
-      a.join_fee,
-      a.description,
-      a.status,
-      a.max_member_count,
-      a.host_user_id,
-      a.created_at,
-      a.updated_at
+    SELECT a.match_id,
+           a.match_type,
+           a.match_detail_type,
+           a.court_id,
+           a.region_code,
+           a.match_date,
+           a.start_time,
+           a.end_time,
+           a.join_fee,
+           a.description,
+           a.status,
+           a.max_member_count,
+           a.host_user_id,
+           a.created_at,
+           a.updated_at
     FROM
       tbl_match_bais a
-    WHERE a.match_id = #{match_id}
+    WHERE a.match_id = #{matchId}
   </select>
 
   <!-- 사용자가 참여한 매치 정보 가져오기 -->
   <select id="getMyMatchDetail" parameterType="java.lang.Long"
     resultMap="matchResultDto">
-    SELECT
-      a.match_id,
-      a.match_type,
-      a.match_detail_type
+    SELECT a.match_id,
+           a.match_type,
+           a.match_detail_type
     FROM
       tbl_match_bais                a
         INNER JOIN tbl_match_member b
                    ON a.match_id = b.match_id
-    WHERE b.user_id = #{user_id}
+    WHERE b.user_id = #{userId}
   </select>
 
   <!-- 매치에 참여한 멤버 목록 가져오기 -->
   <select id="getMatchMembers" resultMap="matchMemberResultDto">
-    SELECT
-      a.match_id,
-      a.user_id,
-      a.status,
-      a.joined_at
+    SELECT a.match_id,
+           a.user_id,
+           a.status,
+           a.joined_at
     FROM
       tbl_match_member a
-    WHERE a.match_id = #{match_id}
+    WHERE a.match_id = #{matchId}
   </select>
 
   <!-- 매치 생성 -->
   <insert id="createMatch"
     parameterType="site.beyondchasm.teambasketball.match.command.MatchCreateCommand"
-    useGeneratedKeys="true" keyProperty="match_id">
+    useGeneratedKeys="true" keyProperty="matchId">
     INSERT
     INTO tbl_match_bais
     (
       match_type, match_detail_type, court_id, region_code, match_date, start_time, end_time,
-      join_fee, description,
-      max_member_count
-        host_user_id,
-      status, created_at, updated_at
+      join_fee, description, max_member_count, host_user_id, status, created_at, updated_at
     )
     VALUES (
-             #{match_type}, #{match_detail_type}, #{court_id}, #{region_code}, #{match_date},
-             #{start_time},
-             #{end_time}, #{join_fee}, #{description}, #{max_member_count}, #{host_user_id},
+             #{matchType}, #{matchDetailType}, #{courtId}, #{regionCode}, #{matchDate},
+             #{startTime}, #{endTime}, #{joinFee}, #{description}, #{maxMemberCount}, #{hostUserId},
              #{status}, NOW(), NOW()
            )
   </insert>
@@ -173,19 +166,19 @@
     parameterType="site.beyondchasm.teambasketball.match.command.MatchUpdateCommand">
     UPDATE tbl_match_bais
     <set>
-      <if test="match_type != null">match_type = #{match_type},</if>
-      <if test="match_detail_type != null">match_detail_type = #{match_detail_type},</if>
-      <if test="court_id != null">court_id = #{court_id},</if>
-      <if test="region_code != null">region_code = #{region_code},</if>
-      <if test="match_date != null">match_date = #{match_date},</if>
-      <if test="start_time != null">start_time = #{start_time},</if>
-      <if test="end_time != null">end_time = #{end_time},</if>
-      <if test="join_fee != null">join_fee = #{join_fee},</if>
+      <if test="matchType != null">match_type = #{matchType},</if>
+      <if test="matchDetailType != null">match_detail_type = #{matchDetailType},</if>
+      <if test="courtId != null">court_id = #{courtId},</if>
+      <if test="regionCode != null">region_code = #{regionCode},</if>
+      <if test="matchDate != null">match_date = #{matchDate},</if>
+      <if test="startTime != null">start_time = #{startTime},</if>
+      <if test="endTime != null">end_time = #{endTime},</if>
+      <if test="joinFee != null">join_fee = #{joinFee},</if>
       <if test="description != null">description = #{description},</if>
       <if test="status != null">status = #{status},</if>
       updated_at = NOW()
     </set>
-    WHERE match_id = #{match_id}
+    WHERE match_id = #{matchId}
   </update>
 
   <!-- 매치 멤버 추가 -->
@@ -197,7 +190,7 @@
       match_id, user_id, status, joined_at
     )
     VALUES (
-             #{match_id}, #{user_id}, #{status}, NOW()
+             #{matchId}, #{userId}, #{status}, NOW()
            )
   </insert>
 
@@ -207,8 +200,8 @@
     DELETE
     FROM
       tbl_match_member
-    WHERE match_id = #{match_id}
-      AND user_id = #{user_id}
+    WHERE match_id = #{matchId}
+      AND user_id = #{userId}
   </delete>
 
   <!-- 매치 멤버 상태 변경 -->
@@ -216,8 +209,8 @@
     parameterType="site.beyondchasm.teambasketball.match.model.MatchMemberDto">
     UPDATE tbl_match_member
     SET status = #{status}
-    WHERE match_id = #{match_id}
-      AND user_id = #{user_id}
+    WHERE match_id = #{matchId}
+      AND user_id = #{userId}
   </update>
 
 </mapper>

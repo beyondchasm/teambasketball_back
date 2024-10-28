@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class MatchMemberCommand {
 
-    private long match_id;
-    private long user_id;
-    private String status;
+  private long matchId;
+  private long userId;
+  private String status;
 }

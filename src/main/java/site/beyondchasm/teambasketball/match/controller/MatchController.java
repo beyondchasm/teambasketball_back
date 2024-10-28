@@ -3,16 +3,7 @@ package site.beyondchasm.teambasketball.match.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import site.beyondchasm.teambasketball.exception.CustomException;
 import site.beyondchasm.teambasketball.exception.ErrorCode;
 import site.beyondchasm.teambasketball.match.command.MatchCreateCommand;
@@ -30,7 +21,10 @@ public class MatchController {
   private final MatchService matchService;
 
   /**
-   * 매치 생성 API POST /api/matches
+   * 새로운 매치를 생성합니다.
+   *
+   * @param matchCreateCommand 생성할 매치 정보
+   * @return 생성된 매치 정보
    */
   @PostMapping
   public ResponseEntity<MatchDto> createMatch(@RequestBody MatchCreateCommand matchCreateCommand) {
@@ -39,18 +33,25 @@ public class MatchController {
   }
 
   /**
-   * 매치 수정 API PUT /api/matches/{match_id}
+   * 매치를 수정합니다.
+   *
+   * @param matchId            수정할 매치 ID
+   * @param matchUpdateCommand 수정할 매치 정보
+   * @return 수정된 매치 정보
    */
   @PutMapping("/{match_id}")
-  public ResponseEntity<MatchDto> editMatch(@PathVariable Long match_id,
+  public ResponseEntity<MatchDto> editMatch(@PathVariable Long matchId,
       @RequestBody MatchUpdateCommand matchUpdateCommand) {
-    matchUpdateCommand.setMatch_id(match_id); // Command 객체에 ID 설정
+    matchUpdateCommand.setMatchId(matchId); // Command 객체에 ID 설정
     MatchDto matchDto = matchService.editMatch(matchUpdateCommand);
     return ResponseEntity.ok(matchDto);
   }
 
   /**
-   * 매치 리스트 조회 API GET /api/matches
+   * 매치 목록을 조회합니다.
+   *
+   * @param matchFilterCommand 매치 필터 조건
+   * @return 필터링된 매치 목록
    */
   @GetMapping
   public ResponseEntity<List<MatchDto>> list(MatchFilterCommand matchFilterCommand) {
@@ -59,11 +60,14 @@ public class MatchController {
   }
 
   /**
-   * 매치 상세 정보 조회 API GET /api/matches/{match_id}
+   * 특정 매치의 상세 정보를 조회합니다.
+   *
+   * @param matchId 조회할 매치 ID
+   * @return 조회된 매치 상세 정보
    */
   @GetMapping("/{match_id}")
-  public ResponseEntity<MatchDto> getMatchDetail(@PathVariable Long match_id) {
-    MatchDto matchDetail = matchService.getMatchDetail(match_id);
+  public ResponseEntity<MatchDto> getMatchDetail(@PathVariable Long matchId) {
+    MatchDto matchDetail = matchService.getMatchDetail(matchId);
     if (matchDetail == null) {
       throw new CustomException(ErrorCode.NOT_EXIST_USER);
     }
@@ -71,11 +75,14 @@ public class MatchController {
   }
 
   /**
-   * 매치 멤버 리스트 조회 API GET /api/matches/{match_id}/members
+   * 특정 매치의 멤버 목록을 조회합니다.
+   *
+   * @param matchId 조회할 매치 ID
+   * @return 매치 멤버 목록
    */
   @GetMapping("/{match_id}/members")
-  public ResponseEntity<List<MatchMemberDto>> getMatchMembers(@PathVariable Long match_id) {
-    List<MatchMemberDto> matchMemberList = matchService.getMatchMembrs(match_id);
+  public ResponseEntity<List<MatchMemberDto>> getMatchMembers(@PathVariable Long matchId) {
+    List<MatchMemberDto> matchMemberList = matchService.getMatchMembers(matchId);
     if (matchMemberList == null) {
       throw new CustomException(ErrorCode.NOT_EXIST_USER);
     }
@@ -83,32 +90,44 @@ public class MatchController {
   }
 
   /**
-   * 매치 신청 API PATCH /api/matches/{match_id}/apply
+   * 매치에 참여 신청을 합니다.
+   *
+   * @param matchId 참여 신청할 매치 ID
+   * @return 신청 성공 여부
    */
   @PatchMapping("/{match_id}/apply")
-  public ResponseEntity<Boolean> applyMatch(@PathVariable Long match_id) {
-    Boolean result = matchService.applyMatch(match_id);
+  public ResponseEntity<Boolean> applyMatch(@PathVariable Long matchId) {
+    Boolean result = matchService.applyMatch(matchId);
     return ResponseEntity.ok(result);
   }
 
   /**
-   * 매치 멤버 삭제 API DELETE /api/matches/{match_id}/members/{user_id}
+   * 매치 멤버를 삭제합니다.
+   *
+   * @param matchId 삭제할 매치 ID
+   * @param userId  삭제할 멤버의 사용자 ID
+   * @return 삭제 성공 응답
    */
   @DeleteMapping("/{match_id}/members/{user_id}")
-  public ResponseEntity<Void> removeMatchMember(@PathVariable Long match_id,
-      @PathVariable Long user_id) {
-    matchService.removeMatchMember(match_id, user_id);
+  public ResponseEntity<Void> removeMatchMember(@PathVariable Long matchId,
+      @PathVariable Long userId) {
+    matchService.removeMatchMember(matchId, userId);
     return ResponseEntity.noContent().build();
   }
 
   /**
-   * 매치 멤버 상태 변경 API PATCH /api/matches/{match_id}/members/{user_id}/status
+   * 매치 멤버의 상태를 변경합니다.
+   *
+   * @param matchId 매치 ID
+   * @param userId  상태를 변경할 멤버의 사용자 ID
+   * @param status  변경할 상태
+   * @return 상태 변경 성공 응답
    */
   @PatchMapping("/{match_id}/members/{user_id}/status")
-  public ResponseEntity<Void> updateMatchMemberStatus(@PathVariable Long match_id,
-      @PathVariable Long user_id,
+  public ResponseEntity<Void> updateMatchMemberStatus(@PathVariable Long matchId,
+      @PathVariable Long userId,
       @RequestParam String status) {
-    matchService.updateMatchMemberStatus(match_id, user_id, status);
+    matchService.updateMatchMemberStatus(matchId, userId, status);
     return ResponseEntity.noContent().build();
   }
 }

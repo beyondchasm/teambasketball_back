@@ -20,94 +20,131 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class MatchService {
-    private final MatchMapper matchMapper;
 
-    public List<MatchDto> getMatchList(MatchFilterCommand filterCommand) {
-        List<MatchDto> teams = matchMapper.getMatchList(filterCommand);
-        long totalElements = matchMapper.getMatchListCount(filterCommand); // 전체 요소 개수 조회
+  private final MatchMapper matchMapper;
 
-        return teams;
+  /**
+   * 필터 조건에 맞는 매치 목록을 조회합니다.
+   *
+   * @param filterCommand 매치 필터 조건
+   * @return 조회된 매치 목록
+   */
+  public List<MatchDto> getMatchList(MatchFilterCommand filterCommand) {
+    return matchMapper.getMatchList(filterCommand);
+  }
+
+  /**
+   * 특정 매치의 상세 정보를 조회합니다.
+   *
+   * @param matchId 매치 ID
+   * @return 조회된 매치 상세 정보
+   */
+  public MatchDto getMatchDetail(Long matchId) {
+    return matchMapper.getMatchDetail(matchId);
+  }
+
+  /**
+   * 새로운 매치를 생성하고 생성된 매치의 ID를 사용하여 매치 정보를 반환합니다.
+   *
+   * @param matchCreateCommand 생성할 매치 정보
+   * @return 생성된 매치 정보
+   */
+  @Transactional
+  public MatchDto createMatch(MatchCreateCommand matchCreateCommand) {
+    Long userId = getCurrentUserId();
+    matchCreateCommand.setHostUserId(userId);
+    matchCreateCommand.setStatus(MatchOverallStatus.RECRUITING.getStatus());
+    matchMapper.createMatch(matchCreateCommand);
+    Long createdMatchId = matchCreateCommand.getMatchId();
+
+    if (userId != null) {
+      MatchMemberCommand matchMemberCommand = new MatchMemberCommand();
+      matchMemberCommand.setUserId(userId);
+      matchMemberCommand.setMatchId(createdMatchId);
+      matchMemberCommand.setStatus(MatchMemberStatus.APPROVED.getStatus());
+      matchMapper.addMatchMember(matchMemberCommand);
     }
 
-    public MatchDto getMatchDetail(Long match_id) {
-        return matchMapper.getMatchDetail(match_id);
+    return getMatchDetail(createdMatchId);
+  }
+
+  /**
+   * 매치 정보를 수정하고 수정된 매치 정보를 반환합니다.
+   *
+   * @param matchUpdateCommand 수정할 매치 정보
+   * @return 수정된 매치 정보
+   */
+  public MatchDto editMatch(MatchUpdateCommand matchUpdateCommand) {
+    matchMapper.editMatch(matchUpdateCommand);
+    return getMatchDetail(matchUpdateCommand.getMatchId());
+  }
+
+  /**
+   * 특정 매치에 소속된 멤버 목록을 조회합니다.
+   *
+   * @param matchId 매치 ID
+   * @return 매치 멤버 목록
+   */
+  public List<MatchMemberDto> getMatchMembers(Long matchId) {
+    return matchMapper.getMatchMembers(matchId);
+  }
+
+  /**
+   * 현재 로그인한 사용자가 특정 매치에 참가 신청을 합니다.
+   *
+   * @param matchId 매치 ID
+   * @return 참가 신청 성공 여부
+   */
+  public Boolean applyMatch(Long matchId) {
+    try {
+      Long userId = getCurrentUserId();
+      if (userId != null) {
+        MatchMemberCommand matchMemberCommand = new MatchMemberCommand();
+        matchMemberCommand.setMatchId(matchId);
+        matchMemberCommand.setUserId(userId);
+        matchMemberCommand.setStatus(MatchMemberStatus.APPLIED.getStatus());
+        matchMapper.addMatchMember(matchMemberCommand);
+      }
+      return true;
+    } catch (Exception e) {
+      System.err.println("Error while applying to match: " + e.getMessage());
+      return false;
     }
+  }
 
-    @Transactional
-    public MatchDto createMatch(MatchCreateCommand matchCreateCommand) {
+  /**
+   * 매치에서 특정 멤버를 삭제합니다.
+   *
+   * @param matchId 매치 ID
+   * @param userId  삭제할 사용자 ID
+   */
+  @Transactional
+  public void removeMatchMember(Long matchId, Long userId) {
+    matchMapper.removeMatchMember(matchId, userId);
+  }
 
+  /**
+   * 매치 멤버의 상태를 변경합니다.
+   *
+   * @param matchId 매치 ID
+   * @param userId  사용자 ID
+   * @param status  변경할 상태
+   */
+  @Transactional
+  public void updateMatchMemberStatus(Long matchId, Long userId, String status) {
+    matchMapper.updateMatchMemberStatus(matchId, userId, status);
+  }
 
-
-        // 현재 로그인한 사용자 정보 얻기
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = null;
-        if (principal instanceof UserPrincipal) {
-            userId = ((UserPrincipal) principal).getId();
-        }
-        matchCreateCommand.setHost_user_id(userId);
-        matchCreateCommand.setStatus(MatchOverallStatus.RECRUITING.getStatus());
-        matchMapper.createMatch(matchCreateCommand); // MatchCommand를 이용해 팀 생성
-        Long createdMatchId = matchCreateCommand.getMatch_id(); // 생성된 팀의 ID 가져오기
-
-        if (userId != null) {
-            MatchMemberCommand matchMemberCommand = new MatchMemberCommand();
-            matchMemberCommand.setUser_id(userId);
-            matchMemberCommand.setMatch_id(createdMatchId);
-            matchMemberCommand.setStatus(MatchMemberStatus.APPROVED.getStatus());
-
-            // 팀 유저 테이블에 사용자 추가
-            matchMapper.addMatchMember(matchMemberCommand);
-        }
-
-        return getMatchDetail(createdMatchId); // 생성된 팀의 상세 정보 조회
+  /**
+   * 현재 로그인한 사용자의 ID를 반환합니다.
+   *
+   * @return 로그인한 사용자 ID
+   */
+  private Long getCurrentUserId() {
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (principal instanceof UserPrincipal) {
+      return ((UserPrincipal) principal).getId();
     }
-
-    public MatchDto editMatch(MatchUpdateCommand teamUpdateCommand) {
-        matchMapper.editMatch(teamUpdateCommand); // MatchCommand를 이용해 팀 생성
-
-
-        return getMatchDetail(teamUpdateCommand.getMatch_id());
-    }
-
-    public List<MatchMemberDto> getMatchMembrs(Long match_id) {
-        return matchMapper.getMatchMembers(match_id);
-    }
-
-
-    public Boolean applyMatch(Long match_id) {
-        try {
-            // 현재 로그인한 사용자 정보 얻기
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Long userId = null;
-            if (principal instanceof UserPrincipal) {
-                userId = ((UserPrincipal) principal).getId();
-            }
-
-            if (userId != null) {
-                MatchMemberCommand matchMemberCommand = new MatchMemberCommand();
-                matchMemberCommand.setMatch_id(match_id);
-                matchMemberCommand.setUser_id(userId);
-                matchMemberCommand.setStatus(MatchMemberStatus.APPLIED.getStatus()); // 예시 역할 코드, 실제 역할 코드에 맞게 조정 필요
-
-                // 팀 유저 테이블에 사용자 추가
-                matchMapper.addMatchMember(matchMemberCommand);
-            }
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error while applying to match: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // 매치 멤버 삭제
-    @Transactional
-    public void removeMatchMember(Long match_id, Long user_id) {
-        matchMapper.removeMatchMember(match_id, user_id);
-    }
-
-    // 매치 멤버 상태 변경
-    @Transactional
-    public void updateMatchMemberStatus(Long match_id, Long user_id, String status) {
-        matchMapper.updateMatchMemberStatus(match_id, user_id, status);
-    }
+    return null;
+  }
 }

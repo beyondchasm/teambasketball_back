@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class FeedImageDto {
-    private long feed_id;
-    private long seq;
-    private String image_path;
-    private String is_main;
+
+  private long feedId;
+  private long seq;
+  private String imagePath;
+  private String isMain;
 
 }

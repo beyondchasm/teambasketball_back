@@ -7,8 +7,9 @@ import java.util.Date;
 
 @Data
 public class MatchMemberDto {
-    private long match_id;
-    private PlayerDto player;
-    private String status;
-    private Date joined_at;
+
+  private long matchId;
+  private PlayerDto player;
+  private String status;
+  private Date joinedAt;
 }

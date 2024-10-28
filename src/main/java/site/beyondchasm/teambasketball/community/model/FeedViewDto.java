@@ -6,7 +6,8 @@ import lombok.Data;
 
 @Data
 public class FeedViewDto {
-	private long feed_id;
-	private long user_id;
-	private Date created_at;
+
+  private long feedId;
+  private long userId;
+  private Date createdAt;
 }

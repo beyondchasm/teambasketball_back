@@ -1,84 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper
-        namespace="site.beyondchasm.teambasketball.court.mapper.CourtMapper">
+  namespace="site.beyondchasm.teambasketball.court.mapper.CourtMapper">
 
-    <resultMap id="courtResultMap"
-               type="site.beyondchasm.teambasketball.court.model.CourtDto">
-        <id property="court_id" column="court_id"/>
-        <result property="court_type" column="court_type"/>
-        <result property="court_type_detail" column="court_type_detail"/>
-        <result property="court_name" column="court_name"/>
-        <result property="region_code" column="region_code"/>
-        <result property="district_code" column="district_code"/>
-        <result property="postal_code" column="postal_code"/>
-        <result property="road_address" column="road_address"/>
-        <result property="address_code" column="address_code"/>
-        <result property="latitude" column="latitude"/>
-        <result property="longitude" column="longitude"/>
-        <result property="phone_number" column="phone_number"/>
-        <result property="parking_available" column="parking_available"/>
-        <result property="facility_status" column="facility_status"/>
-        <result property="accessibility_info"
-                column="accessibility_info"/>
-        <result property="opening_hours" column="opening_hours"/>
-        <result property="court_description" column="court_description"/>
-        <result property="link_url" column="link_url"/>
-        <result property="rating" column="rating"/>
-        <result property="updated_at" column="updated_at"/>
-    </resultMap>
-    <resultMap id="courtImageMap"
-               type="site.beyondchasm.teambasketball.court.model.CourtImageDto">
-        <id property="court_id" column="court_id"/>
-        <result property="seq" column="seq"/>
-        <result property="image_path" column="image_path"/>
-        <result property="is_main" column="is_main"/>
-    </resultMap>
+  <resultMap id="courtResultMap" type="site.beyondchasm.teambasketball.court.model.CourtDto">
+    <id property="courtId" column="court_id"/>
+    <result property="courtType" column="court_type"/>
+    <result property="courtTypeDetail" column="court_type_detail"/>
+    <result property="courtName" column="court_name"/>
+    <result property="regionCode" column="region_code"/>
+    <result property="districtCode" column="district_code"/>
+    <result property="postalCode" column="postal_code"/>
+    <result property="roadAddress" column="road_address"/>
+    <result property="addressCode" column="address_code"/>
+    <result property="latitude" column="latitude"/>
+    <result property="longitude" column="longitude"/>
+    <result property="phoneNumber" column="phone_number"/>
+    <result property="parkingAvailable" column="parking_available"/>
+    <result property="facilityStatus" column="facility_status"/>
+    <result property="accessibilityInfo" column="accessibility_info"/>
+    <result property="openingHours" column="opening_hours"/>
+    <result property="courtDescription" column="court_description"/>
+    <result property="linkUrl" column="link_url"/>
+    <result property="rating" column="rating"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
 
+  <resultMap id="courtImageMap" type="site.beyondchasm.teambasketball.court.model.CourtImageDto">
+    <id property="courtId" column="court_id"/>
+    <result property="seq" column="seq"/>
+    <result property="imagePath" column="image_path"/>
+    <result property="isMain" column="is_main"/>
+  </resultMap>
 
-    <select id="getCourtList" resultMap="courtResultMap"
-            parameterType="site.beyondchasm.teambasketball.court.command.CourtFilterCommand">
-        SELECT
-        c.*
-        FROM tbl_court_bais c
-        <where>
-            <if
-                    test="filter.search_court_type != null and !filter.search_court_type.isEmpty()">
-                AND c.court_type IN
-                <foreach item="type" collection="filter.search_court_type"
-                         open="(" separator="," close=")">
-                    #{type}
-                </foreach>
-            </if>
-            <if
-                    test="filter.search_region_code != null and !filter.search_region_code.isEmpty()">
-                AND c.region_code = #{filter.search_region_code}
-            </if>
-            <if
-                    test="filter.search_court_name != null and !filter.search_court_name.isEmpty()">
-                AND c.court_name LIKE CONCAT('%', #{filter.search_court_name},
-                '%')
-            </if>
-            <!-- 추가 필터링 조건을 이곳에 삽입 -->
-        </where>
-    </select>
+  <select id="getCourtList" resultMap="courtResultMap"
+    parameterType="site.beyondchasm.teambasketball.court.command.CourtFilterCommand">
+    SELECT
+    c.*
+    FROM tbl_court_bais c
+    <where>
+      <if test="filter.searchCourtType != null and !filter.searchCourtType.isEmpty()">
+        AND c.court_type IN
+        <foreach item="type" collection="filter.searchCourtType" open="(" separator="," close=")">
+          #{type}
+        </foreach>
+      </if>
+      <if test="filter.searchRegionCode != null and !filter.searchRegionCode.isEmpty()">
+        AND c.region_code = #{filter.searchRegionCode}
+      </if>
+      <if test="filter.searchCourtName != null and !filter.searchCourtName.isEmpty()">
+        AND c.court_name LIKE CONCAT('%', #{filter.searchCourtName}, '%')
+      </if>
+      <!-- 추가 필터링 조건을 이곳에 삽입 -->
+    </where>
+  </select>
 
-    <select id="getCourtDetail" parameterType="java.lang.Long"
-            resultMap="courtResultMap">
-        SELECT *
-        FROM tbl_court_bais
-        WHERE court_id = #{court_id}
-    </select>
+  <select id="getCourtDetail" parameterType="java.lang.Long" resultMap="courtResultMap">
+    SELECT *
+    FROM
+      tbl_court_bais
+    WHERE court_id = #{courtId}
+  </select>
 
-    <select id="getCourtImages" parameterType="java.lang.Long"
-            resultMap="courtImageMap">
-        SELECT *
-        FROM tbl_court_images
-        WHERE court_id = #{court_id}
-    </select>
+  <select id="getCourtImages" parameterType="java.lang.Long" resultMap="courtImageMap">
+    SELECT *
+    FROM
+      tbl_court_images
+    WHERE court_id = #{courtId}
+  </select>
 
-    <select id="getCourtListCount" resultType="java.lang.Long"></select>
+  <select id="getCourtListCount" resultType="java.lang.Long">
+    SELECT COUNT(*)
+    FROM tbl_court_bais c
+    <where>
+      <if test="filter.searchCourtType != null and !filter.searchCourtType.isEmpty()">
+        AND c.court_type IN
+        <foreach item="type" collection="filter.searchCourtType" open="(" separator="," close=")">
+          #{type}
+        </foreach>
+      </if>
+      <if test="filter.searchRegionCode != null and !filter.searchRegionCode.isEmpty()">
+        AND c.region_code = #{filter.searchRegionCode}
+      </if>
+      <if test="filter.searchCourtName != null and !filter.searchCourtName.isEmpty()">
+        AND c.court_name LIKE CONCAT('%', #{filter.searchCourtName}, '%')
+      </if>
+      <!-- 추가 필터링 조건을 이곳에 삽입 -->
+    </where>
+  </select>
 
 </mapper>
