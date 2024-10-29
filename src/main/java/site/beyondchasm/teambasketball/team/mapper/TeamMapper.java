@@ -71,6 +71,7 @@ public interface TeamMapper {
    * @param userId 사용자 ID
    * @return 조회된 팀 멤버 정보
    */
+
   TeamMemberDto getMyMemberInfo(Long userId);
 
   /**

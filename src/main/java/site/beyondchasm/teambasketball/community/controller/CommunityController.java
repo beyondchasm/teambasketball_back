@@ -52,6 +52,18 @@ public class CommunityController {
     return communityService.getFeedsByChannel(filterCommand);
   }
 
+
+  /**
+   * 피드 목록 조회 GET /community/feeds
+   */
+  @GetMapping("/teamFeeds")
+  public PaginationResult<FeedDto> getTeamFeeds(FeedFilterCommand filterCommand) {
+    filterCommand.setLoginedUserId(getUserId());
+    // 필터 커맨드에 채널 ID 설정
+    PaginationResult<FeedDto> feeds = communityService.getFeedsByTeam(filterCommand);
+    return feeds;
+  }
+
   /**
    * 특정 피드 조회
    *
@@ -146,6 +158,7 @@ public class CommunityController {
     return result > 0 ? ResponseEntity.status(201).body("Feed image created successfully.")
         : ResponseEntity.status(500).body("Failed to create feed image.");
   }
+
 
   /**
    * 댓글 목록 조회

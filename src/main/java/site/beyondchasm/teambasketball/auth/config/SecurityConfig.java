@@ -39,7 +39,7 @@ public class SecurityConfig {
         .csrf((csrf) -> csrf.disable())
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 경로 허용
-            .requestMatchers("/user/**").hasAuthority(UserRole.USER.getRole())
+            .requestMatchers("/api/users/**").hasAuthority(UserRole.USER.getRole())
             .anyRequest().authenticated())
         .sessionManagement(
             (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -54,6 +54,7 @@ public class SecurityConfig {
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return web -> web.ignoring()
-        .requestMatchers("/login/**", "/token/refresh", "/swagger-ui/**", "/v3/api-docs/**");
+        .requestMatchers("/api/auth/oauth/**", "/api/auth/tokens/refresh", "/swagger-ui/**",
+            "/v3/api-docs/**");
   }
 }

@@ -39,7 +39,7 @@ public class MatchController {
    * @param matchUpdateCommand 수정할 매치 정보
    * @return 수정된 매치 정보
    */
-  @PutMapping("/{match_id}")
+  @PutMapping("/{matchId}")
   public ResponseEntity<MatchDto> editMatch(@PathVariable Long matchId,
       @RequestBody MatchUpdateCommand matchUpdateCommand) {
     matchUpdateCommand.setMatchId(matchId); // Command 객체에 ID 설정
@@ -65,7 +65,7 @@ public class MatchController {
    * @param matchId 조회할 매치 ID
    * @return 조회된 매치 상세 정보
    */
-  @GetMapping("/{match_id}")
+  @GetMapping("/{matchId}")
   public ResponseEntity<MatchDto> getMatchDetail(@PathVariable Long matchId) {
     MatchDto matchDetail = matchService.getMatchDetail(matchId);
     if (matchDetail == null) {
@@ -80,7 +80,7 @@ public class MatchController {
    * @param matchId 조회할 매치 ID
    * @return 매치 멤버 목록
    */
-  @GetMapping("/{match_id}/members")
+  @GetMapping("/{matchId}/members")
   public ResponseEntity<List<MatchMemberDto>> getMatchMembers(@PathVariable Long matchId) {
     List<MatchMemberDto> matchMemberList = matchService.getMatchMembers(matchId);
     if (matchMemberList == null) {
@@ -95,7 +95,7 @@ public class MatchController {
    * @param matchId 참여 신청할 매치 ID
    * @return 신청 성공 여부
    */
-  @PatchMapping("/{match_id}/apply")
+  @PatchMapping("/{matchId}/apply")
   public ResponseEntity<Boolean> applyMatch(@PathVariable Long matchId) {
     Boolean result = matchService.applyMatch(matchId);
     return ResponseEntity.ok(result);
@@ -108,7 +108,7 @@ public class MatchController {
    * @param userId  삭제할 멤버의 사용자 ID
    * @return 삭제 성공 응답
    */
-  @DeleteMapping("/{match_id}/members/{user_id}")
+  @DeleteMapping("/{matchId}/members/{user_id}")
   public ResponseEntity<Void> removeMatchMember(@PathVariable Long matchId,
       @PathVariable Long userId) {
     matchService.removeMatchMember(matchId, userId);
@@ -123,7 +123,7 @@ public class MatchController {
    * @param status  변경할 상태
    * @return 상태 변경 성공 응답
    */
-  @PatchMapping("/{match_id}/members/{user_id}/status")
+  @PatchMapping("/{matchId}/members/{user_id}/status")
   public ResponseEntity<Void> updateMatchMemberStatus(@PathVariable Long matchId,
       @PathVariable Long userId,
       @RequestParam String status) {

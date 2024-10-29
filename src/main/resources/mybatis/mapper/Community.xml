@@ -73,6 +73,15 @@
       and channel_id = #{filter.channelId}
   </select>
 
+  <select id="getFeedByTeamListCount"
+    parameterType="site.beyondchasm.teambasketball.community.command.FeedFilterCommand"
+    resultType="long">
+    SELECT count(*)
+    FROM
+      tbl_feed_bais
+    WHERE is_team = true
+      and team_id = #{filter.teamId}
+  </select>
   <select id="getFeedsByChannel"
     parameterType="site.beyondchasm.teambasketball.community.command.FeedFilterCommand"
     resultMap="FeedResultMap">
@@ -112,18 +121,216 @@
     OFFSET #{offset}
   </select>
 
-  <!-- 쿼리문 나머지들도 동일한 방식으로 변경 가능 -->
+
+  <!-- 채널별 피드 목록 조회 (페이징) -->
+  <select id="getFeedsByTeam"
+    parameterType="site.beyondchasm.teambasketball.community.command.FeedFilterCommand"
+    resultMap="FeedResultMap">
+    SELECT a.feed_id,
+           a.is_team,
+           a.channel_id,
+           a.team_id,
+           a.title,
+           a.content_type,
+           a.content,
+           a.user_id,
+           a.created_at,
+           a.updated_at,
+           (SELECT count(*) FROM tbl_feed_view x WHERE x.feed_id = a.feed_id)    AS view_cnt,
+           (SELECT count(*) FROM tbl_comment_bais x WHERE x.feed_id = a.feed_id) AS comment_cnt,
+           (SELECT count(*)
+            FROM
+              tbl_feed_reaction x
+            WHERE x.feed_id = a.feed_id
+              and x.type = 'like')                                               AS like_cnt,
+           (SELECT count(*)
+            FROM
+              tbl_feed_reaction x
+            WHERE x.feed_id = a.feed_id
+              and x.type = 'dislike')                                            AS dislike_cnt,
+           (SELECT nullif(x.type, 'N')
+            FROM
+              tbl_feed_reaction x
+            WHERE x.feed_id = a.feed_id
+              AND user_id = #{filter.loginedUserId})                             AS is_reaction
+    FROM
+      tbl_feed_bais a
+    WHERE a.is_team = true
+      and a.team_id = #{filter.teamId}
+    ORDER BY a.created_at DESC
+      LIMIT #{limit}
+    OFFSET #{offset}
+  </select>
+
+  <!-- 피드 ID로 피드 조회 -->
+  <select id="getFeedById" parameterType="long"
+    resultMap="FeedResultMap">
+    SELECT a.feed_id,
+           a.is_team,
+           a.channel_id,
+           a.team_id,
+           a.title,
+           a.content_type,
+           a.content,
+           a.user_id,
+           a.created_at,
+           a.updated_at,
+           (SELECT count(*) FROM tbl_feed_view x WHERE x.feed_id = a.feed_id)    AS view_cnt,
+           (SELECT count(*) FROM tbl_comment_bais x WHERE x.feed_id = a.feed_id) AS comment_cnt,
+           (SELECT count(*)
+            FROM
+              tbl_feed_reaction x
+            WHERE x.feed_id = a.feed_id
+              and x.type = 'like')                                               AS like_cnt,
+           (SELECT count(*)
+            FROM
+              tbl_feed_reaction x
+            WHERE x.feed_id = a.feed_id
+              and x.type = 'dislike')                                            AS dislike_cnt,
+           (SELECT nullif(x.type, 'N')
+            FROM
+              tbl_feed_reaction x
+            WHERE x.feed_id = a.feed_id
+              AND user_id = #{loginedUserId})                                    AS is_reaction
+    FROM
+      tbl_feed_bais a
+    WHERE a.feed_id = #{feedId}
+  </select>
+
+  <!-- 피드 ID로 피드이미지 조회 -->
+  <select id="getFeedImages" parameterType="long"
+    resultMap="FeedImageResultMap">
+    SELECT *
+    FROM
+      tbl_feed_images
+    WHERE feed_id = #{feedId}
+  </select>
+
+  <!-- 피드 생성 -->
+  <insert id="createFeed"
+    parameterType="site.beyondchasm.teambasketball.community.model.FeedDto"
+    useGeneratedKeys="true" keyProperty="feed_id" keyColumn="feed_id">
+    INSERT
+    INTO tbl_feed_bais
+    (
+      channel_id, is_team, team_id, title, content_type, content, user_id,
+      created_at,
+      updated_at, view_cnt
+    )
+    VALUES (
+             #{channelId}, #{isTeam}, #{teamId}, #{title},
+             #{contentType},
+             #{content}, #{userId},
+             NOW(),
+             NOW(), #{viewCnt}
+           )
+  </insert>
+
+
+  <!-- FeedImageDto를 tbl_feed_images에 삽입하는 쿼리 -->
+  <insert id="createFeedImage"
+    parameterType="site.beyondchasm.teambasketball.community.model.FeedImageDto">
+    <!-- seq 값을 feed_id 기준으로 현재 최대 seq + 1 로 설정 -->
+    <selectKey keyProperty="seq" resultType="int" order="BEFORE">
+      SELECT
+      IFNULL(MAX(seq), 0) + 1
+      FROM tbl_feed_images
+      WHERE feed_id = #{feedId}
+    </selectKey>
+
+    INSERT INTO tbl_feed_images (
+    feed_id,
+    seq,
+    image_path,
+    is_main,
+    created_at
+    ) VALUES (
+    #{feedId},
+    #{seq},
+    #{imagePath},
+    #{isMain},
+    NOW()
+    )
+  </insert>
+
+  <!-- 개별 이미지 삭제 쿼리 -->
+  <delete id="deleteFeedImage"
+    parameterType="site.beyondchasm.teambasketball.community.model.FeedImageDto">
+    DELETE
+    FROM
+      tbl_feed_images
+    WHERE feed_id = #{feedId}
+      AND seq = #{seq}
+  </delete>
+
+  <!-- 모든 이미지 삭제 쿼리 -->
+  <delete id="deleteFeedAllImages" parameterType="long">
+    DELETE
+    FROM
+      tbl_feed_images
+    WHERE feed_id = #{feedId}
+  </delete>
+
   <!-- 피드 업데이트 -->
-  <update id="updateFeed" parameterType="site.beyondchasm.teambasketball.community.model.FeedDto">
+  <update id="updateFeed"
+    parameterType="site.beyondchasm.teambasketball.community.model.FeedDto">
     UPDATE tbl_feed_bais
     SET title        = #{title},
         content_type = #{contentType},
-        content      = #{content},
+        content      =
+          #{content},
         user_id      = #{userId},
         updated_at   = #{updatedAt},
-        view_cnt     = #{viewCnt}
+        view_cnt     =
+          #{viewCnt}
     WHERE feed_id = #{feedId}
   </update>
+
+  <!-- 피드 삭제 -->
+  <delete id="deleteFeed" parameterType="long">
+    DELETE
+    FROM
+      tbl_feed_bais
+    WHERE feed_id = #{feedId}
+  </delete>
+
+
+  <!-- 피드별 댓글 목록 조회 -->
+  <select id="getCommentsByFeed" parameterType="map"
+    resultMap="CommentResultMap">
+    SELECT *
+    FROM
+      tbl_comment_bais
+    WHERE feed_id = #{feedId}
+    ORDER BY created_at ASC
+  </select>
+
+  <!-- 댓글 ID로 댓글 조회 -->
+  <select id="getCommentById" parameterType="long"
+    resultMap="CommentResultMap">
+    SELECT *
+    FROM
+      tbl_comment_bais
+    WHERE comment_id =
+          #{commentId}
+  </select>
+
+  <!-- 댓글 생성 -->
+  <insert id="createComment"
+    parameterType="site.beyondchasm.teambasketball.community.model.CommentDto"
+    useGeneratedKeys="true" keyProperty="comment_id">
+    INSERT
+    INTO tbl_comment_bais
+    (
+      feed_id, content, user_id,
+      created_at, updated_at
+    )
+    VALUES (
+             #{feedId},
+             #{content}, #{userId}, #{createdAt},
+             #{createdAt}
+           )
+  </insert>
 
   <!-- 댓글 업데이트 -->
   <update id="updateComment"
@@ -134,4 +341,129 @@
     WHERE comment_id = #{commentId}
   </update>
 
+  <!-- 댓글 삭제 -->
+  <delete id="deleteComment" parameterType="long">
+    DELETE
+    FROM
+      tbl_comment_bais
+    WHERE comment_id = #{commentId}
+  </delete>
+
+  <!-- 댓글 좋아요 생성 -->
+  <insert id="likeComment"
+    parameterType="site.beyondchasm.teambasketball.community.model.CommentLikeDto">
+    INSERT
+    INTO tbl_comment_like (
+                            comment_id, user_id,
+                            created_at
+                          )
+    VALUES (
+             #{commentId}, #{userId}, #{createdAt}
+           )
+  </insert>
+
+  <!-- 댓글 좋아요 삭제 -->
+  <delete id="unlikeComment"
+    parameterType="site.beyondchasm.teambasketball.community.model.CommentLikeDto">
+    DELETE
+    FROM
+      tbl_comment_like
+    WHERE comment_id =
+          #{commentId}
+      AND user_id = #{userId}
+  </delete>
+
+  <!-- 댓글 좋아요 개수 조회 -->
+  <select id="countCommentLikes" parameterType="long"
+    resultType="int">
+    SELECT COUNT(*)
+    FROM
+      tbl_comment_like
+    WHERE comment_id =
+          #{commentId}
+  </select>
+
+  <!-- 피드 좋아요 생성 -->
+  <insert id="addOrUpdateReaction"
+    parameterType="site.beyondchasm.teambasketball.community.model.FeedReactionDto">
+    INSERT
+    INTO tbl_feed_reaction (
+                             feed_id, user_id,
+                             type,
+                             created_at
+                           )
+    VALUES (
+             #{feedId}, #{userId}, #{type},
+             #{createdAt}
+           )
+  </insert>
+
+  <!-- 피드 좋아요 삭제 -->
+  <delete id="deleteFeedReaction"
+    parameterType="site.beyondchasm.teambasketball.community.model.FeedReactionDto">
+    DELETE
+    FROM
+      tbl_feed_reaction
+    WHERE feed_id = #{feedId}
+      AND user_id = #{userId}
+  </delete>
+  <delete id="deleteFeedAllReaction">
+    DELETE
+    FROM
+      tbl_feed_reaction
+    WHERE feed_id = #{feedId}
+  </delete>
+  <delete id="deleteFeedAllView">
+    DELETE
+    FROM
+      tbl_feed_view
+    WHERE feed_id = #{feedId}
+  </delete>
+  <delete id="deleteFeedAllComment">
+    DELETE
+    FROM
+      tbl_comment_bais
+    WHERE feed_id = #{feedId}
+  </delete>
+
+  <!-- 피드 좋아요 개수 조회 -->
+  <select id="countFeedLikes" parameterType="long"
+    resultType="int">
+    SELECT COUNT(*)
+    FROM
+      tbl_feed_reaction
+    WHERE feed_id = #{feedId}
+  </select>
+
+  <!-- 피드 조회 기록 추가 -->
+  <insert id="addFeedView"
+    parameterType="site.beyondchasm.teambasketball.community.model.FeedViewDto">
+    INSERT
+    INTO tbl_feed_view (
+                         feed_id, user_id,
+                         created_at
+                       )
+    VALUES (
+             #{feedId}, #{userId},
+             #{createdAt}
+           )
+  </insert>
+
+  <!-- 사용자가 이미 피드를 조회했는지 확인 -->
+  <select id="hasUserViewedFeed" parameterType="map"
+    resultType="int">
+    SELECT COUNT(*)
+    FROM
+      tbl_feed_view
+    WHERE feed_id = #{feedId}
+      AND user_id = #{userId}
+  </select>
+
+  <!-- 피드 조회수 증가 -->
+  <update id="incrementViewCount" parameterType="long">
+    UPDATE
+      tbl_feed_bais
+    SET view_cnt = view_cnt + 1
+    WHERE feed_id = #{feedId}
+  </update>
 </mapper>

@@ -265,6 +265,16 @@
              #{applicatedAt}
            )
   </insert>
+  <select id="getMyMemberInfo" resultMap="teamMemberResultDto">
+    SELECT a.team_id,
+           a.user_id,
+           a.player_number,
+           a.role,
+           a.joined_at
+    FROM
+      tbl_team_member a
+    WHERE user_id = #{userId}
+  </select>
   <insert id="addTeamAgeRange"
     parameterType="site.beyondchasm.teambasketball.team.command.TeamAgeRangeCommand">
     INSERT

@@ -38,7 +38,7 @@ public class TeamController {
    * @param teamUpdateCommand 수정할 팀 정보
    * @return 수정된 팀 정보
    */
-  @PutMapping("/{team_id}")
+  @PutMapping("/{teamId}")
   public ResponseEntity<TeamDto> editTeam(@PathVariable Long teamId,
       @RequestBody TeamUpdateCommand teamUpdateCommand) {
     teamUpdateCommand.setTeamId(teamId); // Command 객체에 ID 설정
@@ -64,7 +64,7 @@ public class TeamController {
    * @param teamId 조회할 팀의 ID
    * @return 조회된 팀의 상세 정보
    */
-  @GetMapping("/{team_id}")
+  @GetMapping("/{teamId}")
   public ResponseEntity<TeamDto> getTeamDetail(@PathVariable Long teamId) {
     TeamDto teamDetail = teamService.getTeamDetail(teamId);
     if (teamDetail == null) {
@@ -79,7 +79,7 @@ public class TeamController {
    * @param teamId 조회할 팀의 ID
    * @return 팀 멤버 목록
    */
-  @GetMapping("/{team_id}/members")
+  @GetMapping("/{teamId}/members")
   public ResponseEntity<List<TeamMemberDto>> getTeamMembers(@PathVariable Long teamId) {
     List<TeamMemberDto> teamMemberList = teamService.getTeamMembers(teamId);
     if (teamMemberList == null) {
@@ -95,7 +95,7 @@ public class TeamController {
    * @param command 팀 가입 신청 정보
    * @return 가입 신청 성공 여부
    */
-  @PostMapping("/{team_id}/apply")
+  @PostMapping("/{teamId}/apply")
   public ResponseEntity<Boolean> applyTeam(@PathVariable Long teamId,
       @RequestBody TeamApplyCommand command) {
     command.setTeamId(teamId); // Command 객체에 teamId 설정
