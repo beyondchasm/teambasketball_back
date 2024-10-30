@@ -1,10 +1,7 @@
 package site.beyondchasm.teambasketball.team.command;
 
-import lombok.Data;
-import site.beyondchasm.teambasketball.auth.enums.TeamMemberRole;
-
-import java.time.LocalDate;
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class TeamMemberCommand {

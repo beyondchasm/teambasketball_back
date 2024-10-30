@@ -2,6 +2,7 @@ package site.beyondchasm.teambasketball.auth.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,8 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import lombok.RequiredArgsConstructor;
 import site.beyondchasm.teambasketball.auth.enums.UserRole;
 import site.beyondchasm.teambasketball.auth.filter.JwtFilter;
 import site.beyondchasm.teambasketball.auth.service.JwtTokenService;
@@ -40,6 +39,7 @@ public class SecurityConfig {
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 경로 허용
             .requestMatchers("/api/users/**").hasAuthority(UserRole.USER.getRole())
+            .requestMatchers("/api/notifications/**").permitAll()
             .anyRequest().authenticated())
         .sessionManagement(
             (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

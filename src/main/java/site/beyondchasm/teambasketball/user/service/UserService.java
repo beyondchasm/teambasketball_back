@@ -1,8 +1,7 @@
 package site.beyondchasm.teambasketball.user.service;
 
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import site.beyondchasm.teambasketball.team.mapper.TeamMapper;
 import site.beyondchasm.teambasketball.team.model.MyTeamDto;
 import site.beyondchasm.teambasketball.team.model.TeamMemberDto;

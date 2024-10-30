@@ -5,7 +5,7 @@
 
 <mapper namespace="site.beyondchasm.teambasketball.common.dao.CodeDao">
 
-  <resultMap id="codeResultMap" type="site.beyondchasm.teambasketball.common.domain.CodeDTO">
+  <resultMap id="codeResultMap" type="site.beyondchasm.teambasketball.common.domain.CodeDto">
     <result property="codeType" column="code_type"/>
     <result property="codeId" column="code_id"/>
     <result property="codeName" column="code_name"/>
@@ -13,10 +13,10 @@
 
   <select id="getCodeList" resultMap="codeResultMap">
     SELECT code_type,
-           code_id,
-           code_name
+    code_id,
+    code_name
     FROM
-      tbl_code_bais
+    tbl_code_bais
     WHERE use_yn = 'Y'
   </select>
 

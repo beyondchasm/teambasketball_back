@@ -2,6 +2,7 @@ package site.beyondchasm.teambasketball.court.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +20,8 @@ import site.beyondchasm.teambasketball.exception.ErrorCode;
 @RequestMapping("/api/courts")
 public class CourtController {
 
-  private final CourtService courtService;
+  @Autowired
+  private CourtService courtService;
 
   /**
    * 코트 목록 조회 API GET /api/courts

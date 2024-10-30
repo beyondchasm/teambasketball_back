@@ -1,24 +1,33 @@
 package site.beyondchasm.teambasketball.team.service;
 
+import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.beyondchasm.teambasketball.auth.enums.TeamMemberRole;
 import site.beyondchasm.teambasketball.auth.model.UserPrincipal;
-import site.beyondchasm.teambasketball.team.command.*;
+import site.beyondchasm.teambasketball.notification.model.NotificationMessageDto;
+import site.beyondchasm.teambasketball.notification.service.NotificationService;
+import site.beyondchasm.teambasketball.team.command.TeamActDayCommand;
+import site.beyondchasm.teambasketball.team.command.TeamActTimeCommand;
+import site.beyondchasm.teambasketball.team.command.TeamAgeRangeCommand;
+import site.beyondchasm.teambasketball.team.command.TeamApplyCommand;
+import site.beyondchasm.teambasketball.team.command.TeamCreateCommand;
+import site.beyondchasm.teambasketball.team.command.TeamFilterCommand;
+import site.beyondchasm.teambasketball.team.command.TeamMemberCommand;
+import site.beyondchasm.teambasketball.team.command.TeamUpdateCommand;
 import site.beyondchasm.teambasketball.team.mapper.TeamMapper;
 import site.beyondchasm.teambasketball.team.model.TeamDto;
 import site.beyondchasm.teambasketball.team.model.TeamMemberDto;
-
-import java.util.Date;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class TeamService {
 
   private final TeamMapper teamMapper;
+  private final NotificationService notificationService;
 
   /**
    * 필터 조건에 맞는 팀 목록을 조회합니다.
@@ -103,6 +112,16 @@ public class TeamService {
         teamMemberCommand.setIntroduction(command.getIntroduction());
         teamMemberCommand.setApplicatedAt(new Date());
         teamMapper.addTeamMember(teamMemberCommand);
+      }
+
+      try {
+        NotificationMessageDto notificationMessageDto = new NotificationMessageDto();
+        notificationMessageDto.setToken("testToken1");
+        notificationMessageDto.setTitle("제목 테스트중입니다.");
+        notificationMessageDto.setBody("발송해라");
+        notificationService.sendNotification(notificationMessageDto);
+      } catch (Exception e) {
+        return false;
       }
       return true;
     } catch (Exception e) {

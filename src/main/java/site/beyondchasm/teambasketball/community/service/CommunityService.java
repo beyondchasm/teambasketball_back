@@ -10,12 +10,16 @@ import site.beyondchasm.teambasketball.common.domain.PaginationResult;
 import site.beyondchasm.teambasketball.community.command.FeedFilterCommand;
 import site.beyondchasm.teambasketball.community.mapper.CommunityMapper;
 import site.beyondchasm.teambasketball.community.model.*;
+import site.beyondchasm.teambasketball.notification.model.NotificationMessageDto;
+import site.beyondchasm.teambasketball.notification.service.NotificationService;
 
 @Service
 public class CommunityService {
 
   @Autowired
   private CommunityMapper communityMapper;
+  @Autowired
+  private NotificationService notificationService;
 
   /**
    * 모든 채널 목록을 조회합니다.
@@ -79,6 +83,11 @@ public class CommunityService {
    */
   public FeedDto getFeedById(long feedId, long loginedUserId) {
     addFeedView(feedId, loginedUserId);
+    NotificationMessageDto notificationMessageDto = new NotificationMessageDto();
+    notificationMessageDto.setToken("testToken1");
+    notificationMessageDto.setTitle("제목 테스트중입니다.");
+    notificationMessageDto.setBody("발송해라");
+    notificationService.sendNotification(notificationMessageDto);
     return communityMapper.getFeedById(feedId, loginedUserId);
   }
 

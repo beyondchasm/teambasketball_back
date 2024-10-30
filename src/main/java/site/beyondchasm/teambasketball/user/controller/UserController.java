@@ -1,5 +1,8 @@
 package site.beyondchasm.teambasketball.user.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +23,11 @@ public class UserController {
   /**
    * 현재 유저 정보 조회 API GET /api/users/me
    */
+  @Operation(summary = "현재 유저 정보 조회", description = "현재 로그인된 유저의 정보를 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "유저 정보 조회 성공"),
+      @ApiResponse(responseCode = "404", description = "유저 정보를 찾을 수 없음")
+  })
   @GetMapping("/me")
   public ResponseEntity<UserDto> getCurrentUser() {
     Long userId = SecurityUtil.getCurrentUserId();
@@ -34,6 +42,12 @@ public class UserController {
   /**
    * 유저 프로필 수정 API PUT /api/users/me
    */
+  @Operation(summary = "유저 프로필 수정", description = "현재 로그인된 유저의 프로필 정보를 수정합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "유저 프로필 수정 성공"),
+      @ApiResponse(responseCode = "404", description = "유저 정보를 찾을 수 없음"),
+      @ApiResponse(responseCode = "500", description = "프로필 업데이트 실패")
+  })
   @PutMapping("/me")
   public ResponseEntity<UserDto> updateUserProfile(@RequestBody UserDto userModel) {
     Long userId = SecurityUtil.getCurrentUserId();

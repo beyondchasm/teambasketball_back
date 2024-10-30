@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.log4j.Log4j;
-import site.beyondchasm.teambasketball.common.domain.AttachFileDTO;
+import site.beyondchasm.teambasketball.common.domain.AttachFileDto;
 import site.beyondchasm.teambasketball.common.service.S3Service;
 
 @Log4j
@@ -46,12 +46,12 @@ public class FileController {
    * @return 업로드 결과 리스트와 상태 코드
    */
   @PostMapping(value = "/files", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<List<AttachFileDTO>> uploadMultiFile(
+  public ResponseEntity<List<AttachFileDto>> uploadMultiFile(
       @RequestParam("files") MultipartFile[] uploadFiles) {
-    List<AttachFileDTO> list = new ArrayList<>();
+    List<AttachFileDto> list = new ArrayList<>();
 
     for (MultipartFile multipartFile : uploadFiles) {
-      AttachFileDTO dto = new AttachFileDTO();
+      AttachFileDto dto = new AttachFileDto();
       String originalFileName = multipartFile.getOriginalFilename();
       originalFileName = originalFileName.substring(originalFileName.lastIndexOf("/") + 1);
       dto.setFileName(originalFileName);
@@ -88,9 +88,9 @@ public class FileController {
    * @return 업로드된 파일 정보와 상태 코드
    */
   @PostMapping(value = "/file", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<AttachFileDTO> uploadSingleFile(
+  public ResponseEntity<AttachFileDto> uploadSingleFile(
       @RequestParam("file") MultipartFile uploadFile) {
-    AttachFileDTO dto = new AttachFileDTO();
+    AttachFileDto dto = new AttachFileDto();
 
     String originalFileName = uploadFile.getOriginalFilename();
     originalFileName = originalFileName.substring(originalFileName.lastIndexOf("/") + 1);

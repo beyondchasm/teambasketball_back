@@ -1,10 +1,8 @@
 package site.beyondchasm.teambasketball.team.command;
 
-import lombok.Data;
-import site.beyondchasm.teambasketball.team.model.TeamDto;
-
 import java.util.Date;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class TeamCreateCommand {

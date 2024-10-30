@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import site.beyondchasm.teambasketball.common.dao.CodeDao;
-import site.beyondchasm.teambasketball.common.domain.CodeDTO;
+import site.beyondchasm.teambasketball.common.domain.CodeDto;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class CodeService {
    *
    * @return List<CodeDTO> 코드 목록
    */
-  public List<CodeDTO> getCodeList() {
+  public List<CodeDto> getCodeList() {
     return codeDao.getCodeList();
   }
 

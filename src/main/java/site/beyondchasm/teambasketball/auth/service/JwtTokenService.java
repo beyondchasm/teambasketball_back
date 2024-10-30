@@ -1,13 +1,5 @@
 package site.beyondchasm.teambasketball.auth.service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
-
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -19,14 +11,20 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Date;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import site.beyondchasm.teambasketball.exception.CustomException;
 import site.beyondchasm.teambasketball.exception.ErrorCode;
 
 @Service
 public class JwtTokenService implements InitializingBean {
 
-  private long accessTokenExpirationInSeconds;
-  private long refreshTokenExpirationInSeconds;
+  private final long accessTokenExpirationInSeconds;
+  private final long refreshTokenExpirationInSeconds;
   private final String secretKey;
   private static Key key;
 
