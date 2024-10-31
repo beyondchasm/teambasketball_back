@@ -5,17 +5,36 @@
 
 <mapper namespace="site.beyondchasm.teambasketball.common.dao.RegionDao">
 
-  <resultMap id="regionResultMap" type="site.beyondchasm.teambasketball.common.domain.RegionDTO">
+  <!-- 부모 리전 목록 조회 쿼리 -->
+  <resultMap id="regionResultMap" type="site.beyondchasm.teambasketball.common.domain.RegionDto">
     <result property="regionCode" column="region_code"/>
     <result property="regionName" column="region_name"/>
   </resultMap>
 
   <select id="getRegionList" resultMap="regionResultMap">
     SELECT region_code,
-           region_name
+    region_name
     FROM
-      tbl_region_bais
+    tbl_region_bais
     WHERE use_yn = 'Y'
+  </select>
+
+  <!-- 부모 리전 목록과 "전체" 추가 -->
+  <select id="getParentRegionList" resultMap="regionResultMap">
+    SELECT region_code,
+    region_name
+    FROM tbl_region_bais
+    WHERE parent_region_code IS NULL AND use_yn = 'Y'
+    ORDER BY region_name
+  </select>
+
+  <!-- 자식 리전 목록과 "전체" 추가 -->
+  <select id="getChildRegionList" resultMap="regionResultMap">
+    SELECT region_code,
+    region_name
+    FROM tbl_region_bais
+    WHERE parent_region_code = #{parentRegionCode} AND use_yn = 'Y'
+    ORDER BY region_name
   </select>
 
 </mapper>

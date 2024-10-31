@@ -7,4 +7,5 @@ public class RegionDto {
 
   private String regionCode;
   private String regionName;
+  private String parentRegionCode;
 }

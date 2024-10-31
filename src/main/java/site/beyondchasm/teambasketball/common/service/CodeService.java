@@ -15,7 +15,7 @@ public class CodeService {
   /**
    * 모든 코드 목록을 조회합니다.
    *
-   * @return List<CodeDTO> 코드 목록
+   * @return List<CodeDto> 코드 목록
    */
   public List<CodeDto> getCodeList() {
     return codeDao.getCodeList();

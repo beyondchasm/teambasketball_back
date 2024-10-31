@@ -16,6 +16,6 @@
 	<logger name="jdbc.connection" level="off" />
 
 	<root level="info">
-		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="CONSOLE"/>
 	</root>
 </configuration>
